@@ -23,6 +23,7 @@ class NormalizedMeanSquaredError(keras.losses.Loss):
 
     def call(self, y_true, y_pred):
         mse = tf.square(y_pred - y_true)
+        mse = tf.norm(mse, ord=self.norm_ord, **self.norm_opts)
         err = mse/tf.norm(y_true, ord=self.norm_ord, **self.norm_opts)
         return err
 
