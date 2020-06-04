@@ -1,10 +1,6 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
+#
 import random as r
+import json
 
 from tensorflow import keras
 import tensorflow as tf
@@ -16,9 +12,6 @@ from DenseEncoder import DenseEncoder
 from DenseDecoder import DenseDecoder
 from NormalizedMeanSquaredError import NormalizedMeanSquaredError as NMSE
 from plot_model_prediction import plot_model_prediction
-
-
-# In[2]:
 
 
 # Set Experiment Specifics
@@ -52,14 +45,11 @@ cbs = [keras.callbacks.EarlyStopping(patience=10)]
 batch_size = 64
 
 # Time to train autoencoders only and full models for initial seeding test
-aec_only_time = 0.1 # minutes
-full_model_time = 0.3 # minutes 
+aec_only_time = 5 # minutes
+full_model_time = 25  # minutes 
 
 # This number is used to compute number of epochs for full-model training
-final_model_train_hrs = 0.1
-
-
-# In[ ]:
+final_model_train_hrs = 4
 
 
 ############################################
@@ -180,11 +170,11 @@ best_model.save_weights(model_weight_path)
 
 
 ## Optional Step: Plot learning rates vs autoencoder-only losses
-plt.figure()
-plt.loglog(lrs, final_losses, 'o')
-plt.ylabel("Final Loss")
-plt.xlabel("Adam Learning Rate")
-plt.show()
+#plt.figure()
+#plt.loglog(lrs, final_losses, 'o')
+#plt.ylabel("Final Loss")
+#plt.xlabel("Adam Learning Rate")
+#plt.show()
 
 
 
@@ -208,44 +198,49 @@ full_model.load_weights(model_weight_path)
 model.compile(loss=loss_fns, optimizer=optimizer(learning_rate=best_lr))
 
 # Continue training the (now full) model
-hist = model.fit(x=[data_train_u, data_train_f],
-                 y=[data_train_u, data_train_f, data_train_f, data_train_u],
-                 validation_data=val_data,
-                 callbacks=cbs,
-                 batch_size=batch_size,
-                 epochs=full_epochs)
+hist = full_model.fit(x=[data_train_u, data_train_f],
+                      y=[data_train_u, data_train_f, data_train_f, data_train_u],
+                      validation_data=val_data,
+                      callbacks=cbs,
+                      batch_size=batch_size,
+                      epochs=full_epochs)
 
 # And save the final results!
 full_model_weights_path = "./data/{}_final_model_weights.tf".format(expt_name)
-best_model.save_weights(full_model_weights_path)
+full_model.save_weights(full_model_weights_path)
 
-
-# In[12]:
-
-
+# Look at learning rates vs AEC-only and full-model losses
 lrs = []
 full_losses = []
 aec_losses = []
 for i in range(num_init_models):
-    _, hist, lr, aec_hist = models[i]
-    full_losses.append(np.mean(hist.history['loss'][-3:]))
+    _, full_hist, lr, aec_hist = models[i]
+    full_losses.append(np.mean(full_hist.history['loss'][-3:]))
     aec_losses.append(np.mean(aec_hist.history['loss'][-3:]))
     lrs.append(lr)
     
 ## Optional Step: Plot learning rates vs autoencoder-only losses
-plt.figure()
-plt.loglog(lrs, full_losses, 'o', label="Full Models")
-plt.loglog(lrs, aec_losses, 'o', label="AEC Only")
-plt.ylabel("Final Loss")
-plt.xlabel("Adam Learning Rate")
-plt.legend()
-plt.show()
+#plt.figure()
+#plt.loglog(lrs, full_losses, 'o', label="Full Models")
+#plt.loglog(lrs, aec_losses, 'o', label="AEC Only")
+#plt.ylabel("Final Loss")
+#plt.xlabel("Adam Learning Rate")
+#plt.legend()
+#plt.show()
 
-min(aec_losses), min(full_losses)
+#min(aec_losses), min(full_losses)
 
+#plot_model_prediction(model, 144, data_val_u, data_val_f)
 
-# In[9]:
+# Get the dictionary containing each metric and the loss for each epoch
+history_dict = hist.history
+# And save it for inspection
+hist_filepath = "./data/{}_model_history.json".format(expt_name)
+json.dump(history_dict, open(hist_filepath, 'w'))
 
-
-plot_model_prediction(model, 144, data_val_u, data_val_f)
-
+# Also dump the full_losses, aec_losses, and learning rates
+initial_training = {'aec_only_loss': aec_losses,
+                    'full_init_loss': full_losses,
+                    'learn_rates': lrs}
+init_train_filepath = "./data/{}_initial_train.json".format(expt_name)
+json.dump(initial_training, open(init_train_filepath, 'w'))
