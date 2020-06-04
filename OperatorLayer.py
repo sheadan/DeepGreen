@@ -35,11 +35,12 @@ class SymmetricOperator(keras.layers.Layer):
         return {**base_config,
                 "initializer": self.initializer}
 
-    def get_operator(self):
+    def get_operator(self, X=None):
         # Grab the upper triangular portion of matrix
         utm = tf.linalg.band_part(self.operator, 0, -1, name="L_upper")
         # Generate a symmetric matrix from the upper triangular portion
         return tf.multiply(0.5, utm+tf.transpose(utm), name="L")
+
 
 
 class SolveOperatorInverse(keras.layers.Layer):
@@ -50,7 +51,10 @@ class SolveOperatorInverse(keras.layers.Layer):
 
     def call(self, X):
         # Generate a symmetric matrix from the upper triangular portion
+        #try:
         sym_op = self.operator_layer.get_operator()
+        #except AttributeError:
+        #    sym_op = tf.eye(X.shape[-1])
         # Solve the inverse problem
         X_T = tf.transpose(X)
         LinvX_T = tf.linalg.solve(sym_op, X_T, adjoint=True)

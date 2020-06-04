@@ -1,0 +1,2 @@
+model_checkpoint_path: "Experiment_01_final_model_weights.tf"
+all_model_checkpoint_paths: "Experiment_01_final_model_weights.tf"
