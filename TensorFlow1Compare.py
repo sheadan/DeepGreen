@@ -26,8 +26,12 @@ initializer = tf.keras.initializers.VarianceScaling()
 reg_lambda_l2 = 1e-6
 regularizer = tf.keras.regularizers.l2(reg_lambda_l2)
 
-act_layer = dict(activation=activation, kernel_initializer=initializer, kernel_regularizer=regularizer)
-lin_layer = dict(activation=None, kernel_initializer=initializer, kernel_regularizer=regularizer)
+act_layer = dict(activation=activation,
+                 kernel_initializer=initializer,
+                 kernel_regularizer=regularizer)
+lin_layer = dict(activation=None,
+                 kernel_initializer=initializer,
+                 kernel_regularizer=regularizer)
 
 encoder_layers = 3
 decoder_layers = 4
@@ -45,7 +49,7 @@ cbs = [keras.callbacks.EarlyStopping(patience=10)]
 batch_size = 64
 
 # Time to train autoencoders only and full models for initial seeding test
-aec_only_time = 5 # minutes
+aec_only_time = 5  # minutes
 full_model_time = 25  # minutes 
 
 # This number is used to compute number of epochs for full-model training
@@ -57,7 +61,7 @@ final_model_train_hrs = 4
 ############################################
 
 # Step 0. Assign a random number generator seed
-x = r.randint(0,10**(10))
+x = r.randint(0, 10**(10))
 r.seed(x)
 
 # Step 1. Load in the data
@@ -195,7 +199,8 @@ full_model = AbstractArchitecture(**architecture_config,
 
 # Load the weights
 full_model.load_weights(model_weight_path)
-model.compile(loss=loss_fns, optimizer=optimizer(learning_rate=best_lr))
+full_model.compile(loss=loss_fns,
+                   optimizer=optimizer(learning_rate=best_lr))
 
 # Continue training the (now full) model
 hist = full_model.fit(x=[data_train_u, data_train_f],
