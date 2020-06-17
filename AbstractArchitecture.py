@@ -16,6 +16,7 @@ class AbstractArchitecture(keras.Model):
                  F_encoder_block=DenseEncoder(),
                  F_decoder_block=DenseDecoder(),
                  train_autoencoders_only=False,
+                 latent_config=dict(activation=None),
                  **kwargs):
         super().__init__(**kwargs)  # handles standard args (e.g., name)
 
@@ -24,12 +25,12 @@ class AbstractArchitecture(keras.Model):
 
         # u autoencoder
         self.u_encoder = u_encoder_block
-        self.u_latentspace = keras.layers.Dense(units_latent, activation=None)
+        self.u_latentspace = keras.layers.Dense(units_latent, **latent_config)
         self.u_decoder = u_decoder_block
 
         # F autoencoder
         self.F_encoder = F_encoder_block
-        self.F_latentspace = keras.layers.Dense(units_latent, activation=None)
+        self.F_latentspace = keras.layers.Dense(units_latent, **latent_config)
         self.F_decoder = F_decoder_block
 
         # Now create the operator layer that connects v->f

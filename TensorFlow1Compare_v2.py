@@ -15,7 +15,7 @@ from plot_model_prediction import plot_model_prediction
 
 
 # Set Experiment Specifics
-expt_name = "Experiment_01"
+expt_name = "Experiment_02"
 data_file_prefix = './data/NLSL_expt1'  ## FILL IN HERE (from file name)
 
 # Network architecture design
@@ -32,6 +32,9 @@ act_layer = dict(activation=activation,
 lin_layer = dict(activation=None,
                  kernel_initializer=initializer,
                  kernel_regularizer=regularizer)
+latent_config = dict(activation=None,
+                     kernel_regularizer=regularizer,
+                     use_bias=False)
 
 encoder_layers = 3
 decoder_layers = 4
@@ -94,11 +97,12 @@ architecture_config = {"units_latent": l,
                        "u_encoder_block": DenseEncoder(**encoder_config),
                        "u_decoder_block": DenseDecoder(**decoder_config),
                        "F_encoder_block": DenseEncoder(**encoder_config),
-                       "F_decoder_block": DenseDecoder(**decoder_config)}
+                       "F_decoder_block": DenseDecoder(**decoder_config),
+                       "latent_config": latent_config}
 
 ## Step 3. Train 20 initial models, autoencoders-only then full model
 # create a variety of different models with randomized learning rates
-num_init_models = 20
+num_init_models = 3
 models = []
 
 # Set the loss functions
@@ -112,6 +116,7 @@ val_data = [(data_val_u, data_val_f),
 # Compute number of epochs to train
 aec_epochs = int(aec_only_time*60*2)  # about 2 epochs/sec
 full_epochs = int(full_model_time*60)  # about 1 epoch/sec
+
 
 # For loop for generating the different models
 for i in range(num_init_models):
@@ -146,9 +151,6 @@ for i in range(num_init_models):
     
     # Append the results to the model list
     models.append((model, hist, lr, aec_hist))
-
-
-# In[7]:
 
 
 ## Step 4. Select the best model from the 20 autoencoder-only results
@@ -237,9 +239,17 @@ for i in range(num_init_models):
 
 #plot_model_prediction(model, 144, data_val_u, data_val_f)
 
+## Doubled down on JSON for saving the data, since it is a uniform format!!
+
 # Get the dictionary containing each metric and the loss for each epoch
-history_dict = hist.history
-# And save it for inspection
+history_dict = hist.history.copy()
+
+# For some reason, float32s cannot be serialized... so the training losses are
+# converted to float64s
+for key in history_dict:
+    history_dict[key] = [val.astype(np.float64) for val in history_dict[key]]
+    
+# And now dump it
 hist_filepath = "./data/{}_model_history.json".format(expt_name)
 json.dump(history_dict, open(hist_filepath, 'w'))
 
