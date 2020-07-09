@@ -40,8 +40,8 @@ encoder_layers = 3
 decoder_layers = 4
 add_identity = True
 
-# Model training settings
-## Set optimizer
+# Model training setting
+s## Set optimizer
 optimizer = keras.optimizers.Adam
 optimizer_opts = {}
 
@@ -256,6 +256,7 @@ json.dump(history_dict, open(hist_filepath, 'w'))
 # Also dump the full_losses, aec_losses, and learning rates
 initial_training = {'aec_only_loss': aec_losses,
                     'full_init_loss': full_losses,
-                    'learn_rates': lrs}
+                    'learn_rates': lrs,
+                    'best_lr': best_lr}
 init_train_filepath = "./data/{}_initial_train.json".format(expt_name)
 json.dump(initial_training, open(init_train_filepath, 'w'))

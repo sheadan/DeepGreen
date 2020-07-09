@@ -15,10 +15,10 @@ class DenseEncoder(tf.keras.Model):
         self.block_layers = []
         # The first (num_layers-1) layers will be dense, activated layers
         for i in range(num_layers-1):
-            self.block_layers.append(tf.keras.layers.Dense(units_full, 
+            self.block_layers.append(tf.keras.layers.Dense(units_full,
                                                            **actlay_config))
         # The final layer does not have activation
-        self.block_layers.append(tf.keras.layers.Dense(units_full, 
+        self.block_layers.append(tf.keras.layers.Dense(units_full,
                                                        **linlay_config))
         # The boolean for adding the initial and final layers together
         self.add_init_fin = add_init_fin

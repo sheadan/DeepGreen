@@ -77,8 +77,12 @@ class AbstractArchitecture(keras.Model):
         #Linvf_decoded = self.u_decoder(Linvf)
 
         # Add the superposition loss function
-        f_sums = tf.reshape(f[None]+f[:, None], [-1, self.l])
-        Lv_sums = tf.reshape(Lv[None]+Lv[:, None], [-1, self.l])
+        #f_sums = tf.reshape(f[None]+f[:, None], [-1, self.l])
+        #Lv_sums = tf.reshape(Lv[None]+Lv[:, None], [-1, self.l])
+
+        # Attempting modification of the sums for superposition
+        f_sums = tf.reshape(f[None]+f[:, None], [-1, f.shape[-1]])
+        Lv_sums = tf.reshape(Lv[None]+Lv[:, None], [-1, Lv.shape[-1]])
 
         # Now determine what to return...
         if self.train_autoencoders_only:

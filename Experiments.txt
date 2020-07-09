@@ -1,0 +1,6 @@
+Experiments
+
+Experiment 0 -- tested process with jupyter notebook, ensured everyhting could be saved
+Experiment 1 -- first attempt, no regularization on latent space, l=20
+Experiment 2 -- regularized latent space, l=20, no bias on latent space (unlike expt 1)
+Experiment 3 -- same as expt 2, but now with l=128 AND changed the patience on the early stopping to 150 epochs (from 10 epochs)
