@@ -93,12 +93,13 @@ decoder_config = {'units_full': n,
                   'add_init_fin': add_identity}
 
 # Aggregate settings for model architecture
-architecture_config = {"units_latent": l,
-                       "u_encoder_block": DenseEncoder(**encoder_config),
-                       "u_decoder_block": DenseDecoder(**decoder_config),
-                       "F_encoder_block": DenseEncoder(**encoder_config),
-                       "F_decoder_block": DenseDecoder(**decoder_config),
-                       "latent_config": latent_config}
+architecture_config = {'units_latent': l,
+                       'units_full': n,
+                       'u_encoder_block': DenseEncoder(**encoder_config),
+                       'u_decoder_block': DenseDecoder(**decoder_config),
+                       'F_encoder_block': DenseEncoder(**encoder_config),
+                       'F_decoder_block': DenseDecoder(**decoder_config),
+                       'latent_config': latent_config}
 
 ## Step 3. Train 20 initial models, autoencoders-only then full model
 # create a variety of different models with randomized learning rates
