@@ -1,2 +1,0 @@
-Experiment 00 -- Local testing of the TensorFlow v1 vs v2 comparison script, using Jupyter Notebook.
-Experiment 01 -- Same script, but run for full time length on the Lambda machine.
