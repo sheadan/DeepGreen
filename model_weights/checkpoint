@@ -1,2 +1,2 @@
-model_checkpoint_path: "CheckpointTest-a_final_model_weights.tf"
-all_model_checkpoint_paths: "CheckpointTest-a_final_model_weights.tf"
+model_checkpoint_path: "NLSL_Experiment_04c_final_model_weights.tf"
+all_model_checkpoint_paths: "NLSL_Experiment_04c_final_model_weights.tf"
