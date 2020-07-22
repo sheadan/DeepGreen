@@ -45,10 +45,8 @@ class AbstractArchitecture(keras.Model):
         self.F_decoder = F_decoder_block
 
         # Now create the operator layer that connects v->f
-        self.Operator = SymmetricOperator()
-
-        # and its inverse f->v
-        self.Inverse = SolveOperatorInverse(self.Operator)
+        self.Operator = tf.Variable(self.I_seed(units_latent, units_latent),
+                             trainable=True)
 
         # Set the NMSE loss function used for custom losses
         self.NMSE = NMSE(name="NormalizedMSE")
@@ -71,13 +69,19 @@ class AbstractArchitecture(keras.Model):
         f_expand = tf.matmul(f, self.F_Expand)
         F_decoded = self.F_decoder(f_expand)
 
+        # Calculate symmetric L matrix
+        utm = tf.linalg.band_part(self.Operator, 0, -1, name="L_upper")
+        L = tf.multiply(0.5, utm+tf.transpose(utm), name="L")
+
         # Compute Lv(=f), then put through F_decoder
-        Lv = self.Operator(v)
+        Lv = tf.matmul(v, L)
         Lv_expand = tf.matmul(Lv, self.F_Expand)
         Lv_decoded = self.F_decoder(Lv_expand)
 
         # And L^-1f(= v), then put through u_decoder
-        Linvf = self.Inverse(f)
+        f_T = tf.transpose(f)
+        Linvf_T = tf.linalg.solve(L, f_T, adjoint=True)
+        Linvf = tf.transpose(Linvf_T)
         Linvf_expand = tf.matmul(Linvf, self.u_Expand)
         Linvf_decoded = self.u_decoder(Linvf_expand)
 
