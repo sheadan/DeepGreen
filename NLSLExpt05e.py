@@ -18,7 +18,7 @@ expt_name = "NLSL_Experiment_05e"
 data_file_prefix = './data/NLSL_expt1'  ## FILL IN HERE (from file name)
 
 # Network architecture design
-l = 20  # Latent space size
+l = 128  # Latent space size
 
 activation = "relu"
 initializer = tf.keras.initializers.VarianceScaling()
