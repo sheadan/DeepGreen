@@ -1,2 +1,0 @@
-model_checkpoint_path: "CheckpointTest.tmp"
-all_model_checkpoint_paths: "CheckpointTest.tmp"
