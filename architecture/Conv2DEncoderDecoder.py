@@ -55,8 +55,8 @@ class Conv2DDecoder(tf.keras.Model):
                  output_size = (-1, 128, 128),
                  num_filters = [32, 16, 8], 
                  deconvlay_config=dict(kernel_size=4, strides=2, padding='SAME',
-                                     activation='relu',
-                                     kernel_initializer='he_normal'),
+                                       activation='relu',
+                                       kernel_initializer='he_normal'),
                  add_init_fin=True, **kwargs):
         super().__init__(**kwargs)
 
@@ -92,7 +92,7 @@ class Conv2DDecoder(tf.keras.Model):
         return {**base_config,
                 "init_size": self.init_size,
                 "output_size": self.output_size,
-                "num_filters": self.num_layers,
+                "num_filters": self.num_filters,
                 "deconvlay_config": self.deconvlay_config,
                 "layers": self.layers,
                 "add_init_fin": self.add_init_fin}
