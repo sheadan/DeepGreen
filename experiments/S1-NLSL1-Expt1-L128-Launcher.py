@@ -3,8 +3,8 @@ import subprocess
 import os
 
 experiments = ["S1-NLSL1-Expt1-L128-a",
-               "S1-NLSL1-Expt1-L128-b",
-               "S1-NLSL1-Expt1-L128-c"]
+               "S1-NLSL1-Expt1-L128-b",]
+#               "S1-NLSL1-Expt1-L128-c"]
 
 save_logs = True
 logdir = "../logs/"

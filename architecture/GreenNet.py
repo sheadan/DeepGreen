@@ -91,8 +91,10 @@ class GreenNet(keras.Model):
 
         # Add the superposition loss function
         self.add_loss(self.NMSE(f_sums, Lv_sums))
+
         # Add loss function for Lv = f
         self.add_loss(self.NMSE(f, Lv))
+
         # And return the outputs
 
         return u_decoded, F_decoded, Lv_decoded, Linvf_decoded

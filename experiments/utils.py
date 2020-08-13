@@ -2,6 +2,7 @@
 import random as r
 import json
 import sys
+import os
 
 import numpy as np
 import tensorflow as tf
@@ -91,7 +92,7 @@ def evaluate_initial_models(save_prefix, train_data,
     # For loop for generating, training, and evaluating the initial model pool
     for i in range(num_init_models):
         # Randomly selected learning rate
-        lr = 10**(-r.uniform(3, 6))
+        lr = 10**(-r.uniform(2, 5))
 
         # Create a model, initially only to train autoencoders!
         model = construct_network(train_autoencoders_only=True, **network_config)
@@ -109,7 +110,7 @@ def evaluate_initial_models(save_prefix, train_data,
         #  Fit autoencoder-only model
         aec_hist = model.fit(x=tx, y=ty_aec, validation_data=v_aec,
                              callbacks=cbs_aec, batch_size=batch_size,
-                             epochs=aec_only_epochs)
+                             epochs=aec_only_epochs, verbose=2)
 
         # Re-load weights with best validation loss
         model.load_weights(checkpoint_path_aec)
@@ -153,16 +154,12 @@ def evaluate_initial_models(save_prefix, train_data,
         del model
         tf.keras.backend.clear_session()
 
-    # Store the results dictionary
-    results_path = save_prefix + "initial_pool_results.json"
-    json.dump(results, open(results_path, 'w'))
-
     # Select the best model from the loop
     best_model_idc = np.argmin(results['best_loss'])
     best_model_path = results['model_path'][best_model_idc]
 
     # Return the best model's path
-    return best_model_path
+    return results, best_model_path
 
 
 def train_final_model(model_path: str, save_prefix: str,
@@ -204,8 +201,39 @@ def train_final_model(model_path: str, save_prefix: str,
     model_path = save_prefix + 'final_model'
     model.save(model_path)
 
-    return hist, model_path
+    return hist.history, model_path
 
+def save_results(results_path: str, random_seed: int,
+                 model_path: str, custom_objects: dict,
+                 final_hist: dict, init_hist: dict):
+    # Load the model
+    model = tf.keras.models.load_model(model_path,
+                                       custom_objects=custom_objects)
+    model.save(results_path + 'final_model')
+    print("Best model saved to:", model_path)
+
+    # Export the final model training dictionary
+    hist_filepath = results_path + "initial_pool_results.json"
+    json.dump(init_hist, open(hist_filepath, 'w'))
+
+    # Export the final model training dictionary
+    final_hist['random_seed'] = random_seed
+    hist_filepath = results_path + "final_model_history.json"
+    json.dump(final_hist, open(hist_filepath, 'w'))
+
+    print("Exported training dictionaries to: ", results_path)
+
+
+def check_for_directories(expt_name: str):
+    pardir = os.path.abspath(os.pardir)
+    dirs = ['logs',
+            'model_weights',
+            'model_weights' + os.sep + expt_name,
+            'results',
+            'results' + os.sep + expt_name,
+            ]
+    for dirname in dirs:
+        os.makedirs(pardir+os.sep+dirname, exist_ok=True)
 
 
 def run_experiment(random_seed, expt_name: str, data_file_prefix: str,
@@ -214,6 +242,7 @@ def run_experiment(random_seed, expt_name: str, data_file_prefix: str,
                    ):
     # Assign a random number generator seed for learning rates
     r.seed(random_seed)
+    check_for_directories(expt_name)
 
     # Get the training data
     train_data = get_data(data_file_prefix)
@@ -224,22 +253,20 @@ def run_experiment(random_seed, expt_name: str, data_file_prefix: str,
     # Step 1 -- Train a collection of initial models
     # Autoencoders-only, then full model
     # This method returns the file path to the best model:
-    model_path = evaluate_initial_models(save_prefix,
-                                         train_data,
-                                         training_options,
-                                         network_config)
+    init_hist, model_path = evaluate_initial_models(save_prefix,
+                                                    train_data,
+                                                    training_options,
+                                                    network_config)
 
     # Step 2 -- Load the best model, and train for the full time
     # Load the best model (note: assumes the use of NMSE loss function)
-    hist, model_path = train_final_model(model_path, save_prefix,
-                                         train_data,
-                                         training_options,
-                                         custom_objects)
+    final_hist, model_path = train_final_model(model_path, save_prefix,
+                                               train_data,
+                                               training_options,
+                                               custom_objects)
 
-    # Step 3 -- Export the history of the model and print the best model path
-    print("Best model saved to:", model_path)
-
-    history_dict = hist.history.copy()
-    history_dict['random_seed'] = random_seed
-    hist_filepath = save_prefix + "final_model_history.json"
-    json.dump(history_dict, open(hist_filepath, 'w'))
+    # Step 3 -- Save the results
+    results_path = '../results/{}/'.format(expt_name)
+    save_results(results_path, random_seed,
+                 model_path, custom_objects,
+                 final_hist, init_hist)
