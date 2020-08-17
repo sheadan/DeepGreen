@@ -19,7 +19,7 @@ from NormalizedMeanSquaredError import NormalizedMeanSquaredError as NMSE
 
 
 # Example Experiment Script:
-expt_name = 'S2-NLSL2-Expt1-L20-c'
+expt_name = 'S2-NLSL2-Expt5-L20-a'
 data_file_prefix = '../data/S2-NLSL2'
 
 # Set size of latent space, and retrieve the 'full' size of the data
@@ -43,7 +43,7 @@ enc_dec_config = {'units_full': units_full,
                   'num_layers': 5,
                   'actlay_config': actlay_config,
                   'linlay_config': linlay_config,
-                  'add_init_fin': True}
+                  'add_init_fin': False}
 
 # Network configuration (this is how the AbstractArchitecture will be created)
 network_config = {'units_full': units_full,

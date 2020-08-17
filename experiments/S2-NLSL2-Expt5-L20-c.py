@@ -14,12 +14,12 @@ from utils import run_experiment, get1Ddatasize
 
 # Add the architecture path for the DenseEncoderDecoder and NMSE
 sys.path.append("../architecture/")
-from DenseEncoderDecoder import DenseEncoderDecoder
+from ConvEncoderDecoder import ConvEncoderDecoder, ConvDecoder
 from NormalizedMeanSquaredError import NormalizedMeanSquaredError as NMSE
 
 
 # Example Experiment Script:
-expt_name = 'S2-NLSL2-Expt1-L20-c'
+expt_name = 'S2-NLSL2-Expt5-L20-c'
 data_file_prefix = '../data/S2-NLSL2'
 
 # Set size of latent space, and retrieve the 'full' size of the data
@@ -31,6 +31,17 @@ activation = relu
 initializer = keras.initializers.VarianceScaling()
 regularizer = l1_l2(0, 1e-6)
 
+convlay_config = {'kernel_size': 4,
+                  'strides': 1,
+                  'padding': 'SAME',
+                  'activation': activation,
+                  'kernel_initializer': initializer,
+                  'kernel_regularizer': regularizer}
+
+poollay_config = {'pool_size': 2,
+                  'strides': 2,
+                  'padding': 'VALID'}
+
 actlay_config = {'activation': activation,
                  'kernel_initializer': initializer,
                  'kernel_regularizer': regularizer}
@@ -39,19 +50,35 @@ linlay_config = {'activation': None,
                  'kernel_initializer': initializer,
                  'kernel_regularizer': regularizer}
 
-enc_dec_config = {'units_full': units_full,
-                  'num_layers': 5,
-                  'actlay_config': actlay_config,
-                  'linlay_config': linlay_config,
-                  'add_init_fin': True}
+deconvlay_config = {'kernel_size': 4,
+                    'strides': 2,
+                    'padding': 'SAME',
+                    'activation': activation,
+                    'kernel_initializer': initializer,
+                    'kernel_regularizer': regularizer}
+
+enc_config = {'units_full': units_full,
+              'num_filters': [8, 16, 32, 64],
+              'convlay_config': convlay_config,
+              'poollay_config': poollay_config,
+              'actlay_config': actlay_config,
+              'linlay_config': linlay_config,
+              'add_init_fin': False}
+
+dec_config = {'units_full': units_full,
+              'init_size': 16,
+              'num_filters': [64, 32, 16, 8],
+              'deconvlay_config': deconvlay_config,
+              'actlay_config': actlay_config,
+              'add_init_fin': False}
 
 # Network configuration (this is how the AbstractArchitecture will be created)
 network_config = {'units_full': units_full,
                   'units_latent': units_latent,
-                  'encoder_block': DenseEncoderDecoder,
-                  'decoder_block': DenseEncoderDecoder,
-                  'encoder_config': enc_dec_config,
-                  'decoder_config': enc_dec_config}
+                  'encoder_block': ConvEncoderDecoder,
+                  'decoder_block': ConvDecoder,
+                  'encoder_config': enc_config,
+                  'decoder_config': dec_config}
 
 # Aggregate all the training options in one dictionary
 training_options = {'aec_only_epochs': 75, 

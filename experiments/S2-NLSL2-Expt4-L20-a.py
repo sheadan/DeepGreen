@@ -19,7 +19,7 @@ from NormalizedMeanSquaredError import NormalizedMeanSquaredError as NMSE
 
 
 # Example Experiment Script:
-expt_name = 'S2-NLSL2-Expt1-L20-c'
+expt_name = 'S2-NLSL2-Expt4-L20-a'
 data_file_prefix = '../data/S2-NLSL2'
 
 # Set size of latent space, and retrieve the 'full' size of the data
@@ -40,7 +40,7 @@ linlay_config = {'activation': None,
                  'kernel_regularizer': regularizer}
 
 enc_dec_config = {'units_full': units_full,
-                  'num_layers': 5,
+                  'num_layers': 4,
                   'actlay_config': actlay_config,
                   'linlay_config': linlay_config,
                   'add_init_fin': True}

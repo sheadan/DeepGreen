@@ -14,12 +14,12 @@ from utils import run_experiment, get1Ddatasize
 
 # Add the architecture path for the DenseEncoderDecoder and NMSE
 sys.path.append("../architecture/")
-from DenseEncoderDecoder import DenseEncoderDecoder
+from ConvEncoderDecoder import ConvEncoderDecoder
 from NormalizedMeanSquaredError import NormalizedMeanSquaredError as NMSE
 
 
 # Example Experiment Script:
-expt_name = 'S2-NLSL2-Expt1-L20-c'
+expt_name = 'S2-NLSL2-Expt5-L20-b'
 data_file_prefix = '../data/S2-NLSL2'
 
 # Set size of latent space, and retrieve the 'full' size of the data
@@ -31,6 +31,17 @@ activation = relu
 initializer = keras.initializers.VarianceScaling()
 regularizer = l1_l2(0, 1e-6)
 
+convlay_config = {'kernel_size': 4,
+                  'strides': 1,
+                  'padding': 'SAME',
+                  'activation': activation,
+                  'kernel_initializer': initializer,
+                  'kernel_regularizer': regularizer}
+
+poollay_config = {'pool_size': 2,
+                  'strides': 2,
+                  'padding': 'VALID'}
+
 actlay_config = {'activation': activation,
                  'kernel_initializer': initializer,
                  'kernel_regularizer': regularizer}
@@ -40,16 +51,18 @@ linlay_config = {'activation': None,
                  'kernel_regularizer': regularizer}
 
 enc_dec_config = {'units_full': units_full,
-                  'num_layers': 5,
+                  'num_filters': [8, 16, 32, 64],
+                  'convlay_config': convlay_config,
+                  'poollay_config': poollay_config,
                   'actlay_config': actlay_config,
                   'linlay_config': linlay_config,
-                  'add_init_fin': True}
+                  'add_init_fin': False}
 
 # Network configuration (this is how the AbstractArchitecture will be created)
 network_config = {'units_full': units_full,
                   'units_latent': units_latent,
-                  'encoder_block': DenseEncoderDecoder,
-                  'decoder_block': DenseEncoderDecoder,
+                  'encoder_block': ConvEncoderDecoder,
+                  'decoder_block': ConvEncoderDecoder,
                   'encoder_config': enc_dec_config,
                   'decoder_config': enc_dec_config}
 
