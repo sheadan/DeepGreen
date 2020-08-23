@@ -11,12 +11,31 @@ from tensorflow.keras.layers import Layer
 
 # Add the architecture path for the GreenNet and NMSE
 sys.path.append("../architecture/")
-from GreenNet import GreenNet
+from DiagGreenNet import DiagGreenNet
 from NormalizedMeanSquaredError import NormalizedMeanSquaredError as NMSE
 
 
-def construct_network(**architecture_config):
-    return GreenNet(**architecture_config)
+def construct_network(units_full: int,
+                      units_latent: int,
+                      encoder_block: Layer,
+                      decoder_block: Layer,
+                      encoder_config: dict,
+                      decoder_config: dict,
+                      train_autoencoders_only: bool = False,
+                      ):
+
+    # Aggregate settings for model architecture
+    architecture_config = {'units_latent': units_latent,
+                           'units_full': units_full,
+                           'u_encoder_block': encoder_block(**encoder_config),
+                           'u_decoder_block': decoder_block(**decoder_config),
+                           'F_encoder_block': encoder_block(**encoder_config),
+                           'F_decoder_block': decoder_block(**decoder_config),
+                           'train_autoencoders_only': train_autoencoders_only}
+
+    model = DiagGreenNet(**architecture_config)
+
+    return model
 
 
 def get1Ddatasize(data_file_prefix: str):
@@ -217,10 +236,10 @@ def check_for_directories(expt_name: str):
         os.makedirs(pardir+os.sep+dirname, exist_ok=True)
 
 
-def run_experiment(random_seed, expt_name: str, data_file_prefix: str,
-                   training_options: dict, network_config: dict,
-                   custom_objects: dict = {"NormalizedMeanSquaredError": NMSE}
-                   ):
+def run_dexperiment(random_seed, expt_name: str, data_file_prefix: str,
+                    training_options: dict, network_config: dict,
+                    custom_objects: dict = {"NormalizedMeanSquaredError": NMSE}
+                    ):
     # Assign a random number generator seed for learning rates
     r.seed(random_seed)
     check_for_directories(expt_name)

@@ -8,7 +8,7 @@ from NormalizedMeanSquaredError import NormalizedMeanSquaredError as NMSE
 from DenseEncoderDecoder import DenseEncoderDecoder
 
 
-class GreenNet(keras.Model):
+class DiagGreenNet(keras.Model):
     def __init__(self,
                  units_full=128,
                  units_latent=20,
@@ -16,7 +16,7 @@ class GreenNet(keras.Model):
                  u_decoder_block=DenseEncoderDecoder(),
                  F_encoder_block=DenseEncoderDecoder(),
                  F_decoder_block=DenseEncoderDecoder(),
-                 operator_initializer=keras.initalizers.Identity(),
+                 operator_initializer=tf.random.uniform,
                  train_autoencoders_only=False,
                  **kwargs):
         super().__init__(**kwargs)  # handles standard args (e.g., name)
@@ -41,10 +41,8 @@ class GreenNet(keras.Model):
         self.F_decoder = F_decoder_block
 
         # Now create the operator layer that connects v->f
-        self.operator_initializer = operator_initializer
-        op_size = (units_latent, units_latent)
-        self.Operator = tf.Variable(abs(operator_initializer(op_size)),
-                                    trainable=True)
+        self.Operator = tf.Variable(tf.random.uniform(shape=[units_latent]),
+                                    trainable=True, name='Operator')
 
         # Set the NMSE loss function used for custom losses
         self.NMSE = NMSE(name="NormalizedMSE")
@@ -67,9 +65,8 @@ class GreenNet(keras.Model):
         f_expand = tf.matmul(f, self.F_Expand)
         F_decoded = self.F_decoder(f_expand)
 
-        # Calculate symmetric L matrix
-        utm = tf.linalg.band_part(self.Operator, 0, -1, name="L_upper")
-        L = tf.multiply(0.5, utm+tf.transpose(utm), name="L")
+        # Calculate diagonalized L matrix
+        L = tf.linalg.diag(self.Operator, name='L')
 
         # Compute Lv(=f), then put through F_decoder
         Lv = tf.matmul(v, L)
