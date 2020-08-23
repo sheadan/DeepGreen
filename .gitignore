@@ -1,5 +1,7 @@
 # Model weights
 model_weights/
+archive/
+Archive/
 
 # Log files
 logs/
