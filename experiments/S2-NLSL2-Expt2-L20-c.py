@@ -19,7 +19,7 @@ from NormalizedMeanSquaredError import NormalizedMeanSquaredError as NMSE
 
 
 # Example Experiment Script:
-expt_name = 'S2-NLSL2-Expt2-L-20-c'
+expt_name = 'S2-NLSL2-Expt2-L20-c'
 data_file_prefix = '../data/S2-NLSL2'
 
 # Set size of latent space, and retrieve the 'full' size of the data
