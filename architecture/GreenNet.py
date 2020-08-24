@@ -16,7 +16,7 @@ class GreenNet(keras.Model):
                  u_decoder_block=DenseEncoderDecoder(),
                  F_encoder_block=DenseEncoderDecoder(),
                  F_decoder_block=DenseEncoderDecoder(),
-                 operator_initializer=keras.initalizers.Identity(),
+                 operator_initializer=keras.initializers.Identity(),
                  train_autoencoders_only=False,
                  **kwargs):
         super().__init__(**kwargs)  # handles standard args (e.g., name)
