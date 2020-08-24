@@ -62,7 +62,7 @@ training_options = {'aec_only_epochs': 25,
                     }
 
 ####################################################################
-### Launch the Experiment
+# Launch the Experiment
 ####################################################################
 
 # Get a random number generator seed
@@ -72,9 +72,9 @@ random_seed = r.randint(0, 10**(10))
 custom_objs = {"NormalizedMeanSquaredError": NMSE}
 
 # And run the experiment!
-run_experiment(random_seed=random_seed,
-               expt_name=expt_name,
-               data_file_prefix=data_file_prefix,
-               training_options=training_options,
-               network_config=network_config,
-               custom_objects=custom_objs)
+run_dexperiment(random_seed=random_seed,
+                expt_name=expt_name,
+                data_file_prefix=data_file_prefix,
+                training_options=training_options,
+                network_config=network_config,
+                custom_objects=custom_objs)
