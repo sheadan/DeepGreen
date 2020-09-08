@@ -2,6 +2,8 @@
 model_weights/
 archive/
 Archive/
+*.png
+*.svg
 
 # Log files
 logs/
