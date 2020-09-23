@@ -44,10 +44,11 @@ enc_dec_config = {'units_full': units_full,
 # Network configuration (this is how the AbstractArchitecture will be created)
 network_config = {'units_full': units_full,
                   'units_latent': units_latent,
-                  'encoder_block': DenseEncoderDecoder,
-                  'decoder_block': DenseEncoderDecoder,
-                  'encoder_config': enc_dec_config,
-                  'decoder_config': enc_dec_config}
+                  'u_encoder_block': DenseEncoderDecoder(**enc_dec_config),
+                  'u_decoder_block': DenseEncoderDecoder(**enc_dec_config),
+                  'F_encoder_block': DenseEncoderDecoder(**enc_dec_config),
+                  'F_decoder_block': DenseEncoderDecoder(**enc_dec_config),
+                  }
 
 # Aggregate all the training options in one dictionary
 training_options = {'aec_only_epochs': 25, 
