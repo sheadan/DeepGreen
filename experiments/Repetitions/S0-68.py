@@ -61,15 +61,6 @@ training_options = {'aec_only_epochs': 75,
                     'batch_size': 64
                     }
 
-training_options = {'aec_only_epochs': 10, 
-                    'init_full_epochs': 25,
-                    'best_model_epochs': 100,
-                    'num_init_models': 3, 
-                    'loss_fn': NMSE(),
-                    'optimizer': keras.optimizers.Adam,
-                    'optimizer_opts': {},
-                    'batch_size': 64
-                    }
 
 ####################################################################
 ### Launch the Experiment
