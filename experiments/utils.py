@@ -151,9 +151,6 @@ def train_final_model(model_path: str, save_prefix: str,
     best_model_epochs = train_opts['best_model_epochs']
     batch_size = train_opts['batch_size']
 
-    # Extract the training data
-    tx, ty_aec, ty_full, v_aec, v_full = train_data
-
     # Load the model
     model = tf.keras.models.load_model(model_path,
                                        custom_objects=custom_objects)
