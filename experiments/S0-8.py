@@ -19,7 +19,7 @@ from NormalizedMeanSquaredError import NormalizedMeanSquaredError as NMSE
 
 
 # Example Experiment Script:
-expt_name = 'S0-1'
+expt_name = 'S0-8'
 data_file_prefix = '../data/S0-Oscillator'
 
 # Set size of latent space, and retrieve the 'full' size of the data
