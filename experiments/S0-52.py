@@ -2,10 +2,6 @@
 import random as r
 import sys
 
-import tensorflow as tf
-for gpu in tf.config.experimental.list_physical_devices("GPU"):
-  tf.config.experimental.set_memory_growth(gpu, True)
-
 from tensorflow import keras
 from tensorflow.keras.regularizers import l1_l2
 from tensorflow.keras.activations import relu
@@ -19,7 +15,7 @@ from NormalizedMeanSquaredError import NormalizedMeanSquaredError as NMSE
 
 
 # Example Experiment Script:
-expt_name = 'S0-1'
+expt_name = 'S0-52'
 data_file_prefix = '../data/S0-Oscillator'
 
 # Set size of latent space, and retrieve the 'full' size of the data
