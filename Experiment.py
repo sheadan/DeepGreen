@@ -122,12 +122,25 @@ class Experiment:
         # Prepare data to be scored:
         true_ys = [u, F, F, u]
         predicted_ys = self.model.predict(x=[u, F])
+        # Compute the losses
         losses = []
         for (pred_y, true_y) in zip(predicted_ys, true_ys):
             losses.append(rel_mse(pred_y, true_y, 1e-5))
         # Since the losses are actually returned as L2, L1, L5, L6 we will swap
         # the positions of first two such that the list returns L1, L2, L5, L6
         losses[0], losses[1] = losses[1], losses[0]
+        # Now we'll compute the linearity loss L3 Lv=f:
+        u, F = self.access_data(dataset_name)
+        # Project it into the latent space
+        v = tf.matmul(self.u_enc(u), self.model.u_Reduce)
+        f = tf.matmul(self.F_enc(F), self.model.F_Reduce)
+        # Compute L[v]
+        Lv = tf.matmul(v, self.L)
+        # Determine loss
+        lin_loss = np.asarray([NMSE()(f[i,:], Lv[i,:]) for i in range(f.shape[0])])
+        # Insert the linear loss into the list:
+        losses.insert(2, lin_loss)
+        #print('Linearity Loss:', lin_loss)
         return losses
 
     def evaluate_model(self, dataset_name):

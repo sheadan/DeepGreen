@@ -9,6 +9,7 @@ from mpl_toolkits import mplot3d
 import matplotlib.ticker as mtick
 import matplotlib as mpl
 from matplotlib.patches import FancyArrowPatch
+from matplotlib.collections import LineCollection
 
 from architecture.NormalizedMeanSquaredError import NormalizedMeanSquaredError as NMSE
 
@@ -54,9 +55,9 @@ def prediction_compare_plot(experiment, dataset_name):
     modes = ['Best', 'Mean', 'Worst']
 
     # Set the line styles for the different lines
-    true_line_u = dict(color='cornflowerblue', lw=1)
-    true_line_f = dict(color='orange', lw=1)
-    pred_line = dict(linewidth = 0.75, linestyle='--', color='k', alpha=0.8)
+    true_line_u = dict(color='cornflowerblue')
+    true_line_f = dict(color='orange')
+    pred_line = dict(linestyle='--', color='k', alpha=0.8)
     
     for j in range(3):
         mode = modes[j]
@@ -138,7 +139,7 @@ def latent_space_plot(expt, index, dataset_name='train1'):
 def loss_boxplot(expt, dataset_name='test1'):
     # Generate loss data, and set labels
     losses = expt.compute_losses(dataset_name)
-    labels = [r"$\mathcal{L}_1$", r"$\mathcal{L}_2$",  r"$\mathcal{L}_5$", r"$\mathcal{L}_6$"]
+    labels = [r"$\mathcal{L}_1$", r"$\mathcal{L}_2$", r"$\mathcal{L}_3$",  r"$\mathcal{L}_5$", r"$\mathcal{L}_6$"]
 
     # Set up figure, axes
     fig = plt.figure()
@@ -147,12 +148,12 @@ def loss_boxplot(expt, dataset_name='test1'):
     plt.boxplot(losses, labels=labels, showfliers=False, medianprops={'color': 'black'})
 
     # Format the Y-Axis
-    plt.ylabel("Loss Function Value")
-    plt.ylim([1e-6, 1e-2])
+    plt.ylabel("Normalized MSE")
+    plt.ylim([1e-6, 1e-3])
     plt.yscale('log')
     ax = plt.gca()
-    ax.set_yticks([1e-6, 1e-5, 1e-4, 1e-3, 1e-2])
-    ax.set_yticklabels([r"$10^{-6}$", r"$10^{-5}$", r"$10^{-4}$", r"$10^{-3}$", r"$10^{-2}$"])
+    ax.set_yticks([1e-6, 1e-5, 1e-4, 1e-3])
+    ax.set_yticklabels([r"$10^{-6}$", r"$10^{-5}$", r"$10^{-4}$", r"$10^{-3}$"])
 
 
 def training_loss_epochs_plot(expt, roll_window=20):
@@ -188,6 +189,232 @@ def training_loss_epochs_plot(expt, roll_window=20):
 
     # Format the axes
     plt.xlabel("Epochs")
-    plt.ylabel("Cumulative Loss")
+    plt.ylabel("Normalized MSE")
     plt.legend(loc='upper right')
     plt.xlim([0,val_loss.shape[0]])
+
+
+
+def waterfall_plot(fig, ax, X, Y, Z, **kwargs):
+    '''
+    Make a waterfall plot
+    Input:
+        fig,ax : matplotlib figure and axes to populate
+        Z : n,m numpy array. Must be a 2d array even if only one line should be plotted
+        X,Y : n,m array
+        kwargs : kwargs are directly passed to the LineCollection object
+    '''
+    # Set normalization to the same values for all plots
+    norm = plt.Normalize(Z.min().min(), Z.max().max())
+    
+    # Check sizes to loop always over the smallest dimension
+    n,m = Z.shape
+    if n>m:
+        X=X.T; Y=Y.T; Z=Z.T
+        m,n = n,m
+
+    for j in range(n):
+        # reshape the X,Z into pairs 
+        points = np.array([X[j,:], Z[j,:]]).T.reshape(-1, 1, 2)
+        segments = np.concatenate([points[:-1], points[1:]], axis=1)  
+        # The values used by the colormap are the input to the array parameter
+        lc = LineCollection(segments, norm=norm, array=(Z[j,1:]+Z[j,:-1])/2, **kwargs)
+        line = ax.add_collection3d(lc,zs=(Y[j,1:]+Y[j,:-1])/2, zdir='y') # add line to axes
+
+    #fig.colorbar(lc) # add colorbar, as the normalization is the same for all
+    # it doesent matter which of the lc objects we use
+    ax.auto_scale_xyz(X,Y,Z) # set axis limits
+    
+def generate_GL_plot(expt, G_off=0.7, L_off=0.7):
+    # Grab the relevant L and G matrices
+    L = np.array(expt.L)
+    G = expt.G
+
+    # Set up and plot
+    x = np.linspace(0,2*np.pi, L.shape[0])
+    X,XI = np.meshgrid(x,x)
+
+    # Options
+    cmap = 'terrain'
+    waterfall_opts = dict(linewidth=1.5, alpha=1.0, cmap=cmap)
+    contour_opts = dict(levels=100, zdir='z', cmap=cmap)
+
+    # Set limits for z-axis
+    Gm = np.min(G)
+    GM = np.max(G)
+    Goffset = Gm - G_off * (GM - Gm)
+    Lm = np.min(L)
+    LM = np.max(L)
+    Loffset = Lm - L_off * (LM - Lm)
+
+    fig = plt.figure(figsize=(7.3,3.65))
+
+    # set up the axes for the first plot, plot G
+    ax = fig.add_subplot(1, 2, 1, projection='3d')
+    waterfall_plot(fig, ax, X, XI, G, **waterfall_opts) 
+    ax.contourf(X, XI, G, offset=Goffset, vmin=Gm, vmax=GM, **contour_opts)
+
+    # Format x-axis
+    ax.set_xlabel(r"$\mathbf{x}$", labelpad=-5)
+    ax.set_xticks([0, np.pi, 2*np.pi])
+    ax.set_xticklabels(["0", r"$\pi$", r"$2\pi$"])
+    ax.set_xlim([0,2*np.pi])
+
+    # Format xi-axis
+    ax.set_ylabel(r'$\boldsymbol{\xi}$', labelpad=-5)
+    ax.set_yticks([0, np.pi, 2*np.pi])
+    ax.set_yticklabels(["0", r"$\pi$", r"$2\pi$"])
+    ax.set_ylim([0,2*np.pi])
+
+    # Format z-axis
+    ax.set_zlim(Goffset, GM)
+
+    # Adjust the paddings
+    ax.xaxis.set_rotate_label(False)
+    ax.yaxis.set_rotate_label(False)
+    ax.tick_params(axis='both', pad=-0.5)
+    ax.tick_params(axis='x', pad=-5)
+    ax.tick_params(axis='y', pad=-5)
+
+    # Place the z-axis label using text command
+    ax.text(x=-0.5, y=2*np.pi, z=1.2*np.max(G), s=r'$\mathbf{G}$')#rotation_mode=None, rotation=180)
+
+    # Set up the view position angle
+    ax.view_init(15,215)
+
+    # set up the axes for the second plot, plot L
+    ax = fig.add_subplot(1, 2, 2, projection='3d')
+    waterfall_plot(fig, ax, X, XI, L, **waterfall_opts) 
+    ax.contourf(X, XI, L, offset=Loffset, vmin=Lm, vmax=LM, **contour_opts)
+
+    # Format x-axis
+    ax.set_xlabel(r"$\mathbf{x}$", labelpad=-5)
+    ax.set_xticks([0, np.pi, 2*np.pi])
+    ax.set_xticklabels(["0", r"$\pi$", r"$2\pi$"])
+    ax.set_xlim([0,2*np.pi])
+
+    # Format xi-axis
+    ax.set_ylabel(r'$\boldsymbol{\xi}$', labelpad=-5)
+    ax.set_yticks([0, np.pi, 2*np.pi])
+    ax.set_yticklabels(["0", r"$\pi$", r"$2\pi$"])
+    ax.set_ylim([0,2*np.pi])
+
+    # Format z-axis
+    ax.set_zlim(Loffset, LM)
+
+    # Adjust the paddings
+    ax.xaxis.set_rotate_label(False)
+    ax.yaxis.set_rotate_label(False)
+    ax.tick_params(axis='both', pad=-2)
+    ax.tick_params(axis='x', pad=-5)
+    ax.tick_params(axis='y', pad=-5)
+
+    # Place the z-axis label using text command
+    ax.text(x=-0.5, y=2*np.pi, z=1.2*np.max(L), s=r'$\mathbf{L}$')#rotation_mode=None, rotation=180)
+
+    # Set up the view position angle
+    ax.view_init(15,215)
+
+    # Change spacing
+    #plt.subplots_adjust(wspace=-0.18, hspace=0.0)#, left=0.05, right=0.07)
+
+
+def generate_G_plot(expt, G_off=0.7):
+    # Grab the relevant L and G matrices
+    G = expt.G
+
+    # Set up and plot
+    x = np.linspace(0,2*np.pi, G.shape[0])
+    X,XI = np.meshgrid(x,x)
+
+    # Plotting options
+    cmap = 'terrain'
+    waterfall_opts = dict(linewidth=1.5, alpha=1.0, cmap=cmap)
+    contour_opts = dict(levels=100, zdir='z', cmap=cmap)
+
+    # Initialize a figure
+    fig = plt.figure()
+    
+    # Set limits for z-axis
+    Gm = np.min(expt.G)
+    GM = np.max(expt.G)
+    Goffset = Gm - G_off * (GM - Gm)
+
+    # set up the axes for the first plot, plot G
+    ax = fig.add_subplot(1, 1, 1, projection='3d')
+    waterfall_plot(fig, ax, X, XI, expt.G, **waterfall_opts) 
+    ax.contourf(X, XI, expt.G, offset=Goffset, vmin=Gm, vmax=GM, **contour_opts)
+
+    # Format x-axis
+    ax.set_xlabel(r"$\mathbf{x}$", labelpad=-5)
+    ax.set_xticks([0, np.pi, 2*np.pi])
+    ax.set_xticklabels(["0", r"$\pi$", r"$2\pi$"])
+    ax.set_xlim([0,2*np.pi])
+
+    # Format xi-axis
+    ax.set_ylabel(r'$\boldsymbol{\xi}$', labelpad=-5)
+    ax.set_yticks([0, np.pi, 2*np.pi])
+    ax.set_yticklabels(["0", r"$\pi$", r"$2\pi$"])
+    ax.set_ylim([0,2*np.pi])
+    
+    # Adjust the paddings
+    ax.xaxis.set_rotate_label(False)
+    ax.yaxis.set_rotate_label(False)
+    ax.tick_params(axis='both', pad=-2)
+    ax.tick_params(axis='x', pad=-5)
+    ax.tick_params(axis='y', pad=-5)
+
+    # Format z-axis
+    ax.set_zlim(Goffset, GM)
+
+    # Place the z-axis label using text command
+    ax.text(x=-0.5, y=2*np.pi, z=1.4*np.max(expt.G), s=r'$\mathbf{G}(x,\xi)$')#rotation_mode=None, rotation=180)
+
+    # Set up the view position angle
+    ax.view_init(15,215)
+    
+    # Return the figure reference
+    return fig
+
+def summary_boxplot(s0, s1, s2):
+    # Generate loss data, and set labels
+    s0_losses = s0.compute_losses('test1')
+    s1_losses = s1.compute_losses('test1')
+    s2_losses = s2.compute_losses('test1')
+    labels = [r"$\mathcal{L}_1$", r"$\mathcal{L}_2$", r"$\mathcal{L}_3$",  r"$\mathcal{L}_5$", r"$\mathcal{L}_6$"]
+
+    # Set up figure, axes
+    fig = plt.figure()
+
+    # Plot each series
+    b0=plt.boxplot(s0_losses,
+                   positions=[0.75, 1.75, 2.75, 3.75, 4.75],
+                   medianprops={'color': 'black'},
+                   showfliers=False, widths=0.2)
+
+    b1=plt.boxplot(s1_losses,
+                   positions=[1, 2, 3, 4, 5],
+                   medianprops={'color': 'green'},
+                   showfliers=False, widths=0.2)
+
+    b2=plt.boxplot(s2_losses,
+                   positions=[1.25, 2.25, 3.25, 4.25, 5.25],
+                   medianprops={'color': 'purple'},
+                   showfliers=False, widths=0.2)
+
+    # Format the X axis
+    plt.xticks([1,2,3,4, 5], labels)
+
+    # Format the Y-Axis
+    plt.ylabel("Normalized MSE")
+    plt.ylim([1e-6, 1e-1])
+    plt.yscale('log')
+    ax = plt.gca()
+    ax.set_yticks([1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
+    ax.set_yticklabels([r"$10^{-6}$", r"$10^{-5}$", r"$10^{-4}$", r"$10^{-3}$", r"$10^{-2}$", r"$10^{-1}$"])
+
+    # Format the legend
+    plt.legend([b0['medians'][0], b1['medians'][0], b2['medians'][0]],
+               ["System 1", "System 2", "System 3"],
+               ncol=3, loc='center', bbox_to_anchor=(0.5, -0.28))
+
