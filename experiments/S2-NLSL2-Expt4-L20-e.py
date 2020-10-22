@@ -14,17 +14,17 @@ from utils import run_experiment, get1Ddatasize
 
 # Add the architecture path for the DenseEncoderDecoder and NMSE
 sys.path.append("../architecture/")
-from Dense2DEncoderDecoder import Dense2DEncoder, Dense2DDecoder
-from NormalizedMeanSquaredError import NormalizedMeanSquaredError2D as NMSE
+from DenseEncoderDecoder import DenseEncoderDecoder
+from NormalizedMeanSquaredError import NormalizedMeanSquaredError as NMSE
+
 
 # Example Experiment Script:
-expt_name = 'S3-NLP-Expt2-L200-a'
-data_file_prefix = '../data/S3-NLP'
+expt_name = 'S2-NLSL2-Expt4-L20-e'
+data_file_prefix = '../data/S2-NLSL2'
 
 # Set size of latent space, and retrieve the 'full' size of the data
-units_latent = 200
-input_shape = get1Ddatasize(data_file_prefix)[-2:]  # the inputs have shape given by the last two dimensions
-units_full = input_shape[0]*input_shape[1]
+units_latent = 20
+units_full = get1Ddatasize(data_file_prefix)[-1] # the last dimension is the 'length' of the data, for 1D data
 
 # Set up encoder and decoder configuration dict(s)
 activation = relu
@@ -40,8 +40,7 @@ linlay_config = {'activation': None,
                  'kernel_regularizer': regularizer}
 
 enc_dec_config = {'units_full': units_full,
-                  'units_hidden': units_latent,
-                  'num_layers': 3,
+                  'num_layers': 1,
                   'actlay_config': actlay_config,
                   'linlay_config': linlay_config,
                   'add_init_fin': True}
@@ -49,11 +48,10 @@ enc_dec_config = {'units_full': units_full,
 # Network configuration (this is how the AbstractArchitecture will be created)
 network_config = {'units_full': units_full,
                   'units_latent': units_latent,
-                  'u_encoder_block': Dense2DEncoder(**enc_dec_config),
-                  'u_decoder_block': Dense2DDecoder(**enc_dec_config), 
-                  'F_encoder_block': Dense2DEncoder(**enc_dec_config),
-                  'F_decoder_block': Dense2DDecoder(**enc_dec_config),
-                  'operator_initializer': keras.initializers.Identity()}  
+                  'encoder_block': DenseEncoderDecoder,
+                  'decoder_block': DenseEncoderDecoder,
+                  'encoder_config': enc_dec_config,
+                  'decoder_config': enc_dec_config}
 
 # Aggregate all the training options in one dictionary
 training_options = {'aec_only_epochs': 75, 
@@ -74,7 +72,7 @@ training_options = {'aec_only_epochs': 75,
 random_seed = r.randint(0, 10**(10))
 
 # Set the custom objects used in the model (for loading purposes)
-custom_objs = {"NormalizedMeanSquaredError2D": NMSE}
+custom_objs = {"NormalizedMeanSquaredError": NMSE}
 
 # And run the experiment!
 run_experiment(random_seed=random_seed,
