@@ -55,8 +55,8 @@ def prediction_compare_plot(experiment, dataset_name):
     modes = ['Best', 'Mean', 'Worst']
 
     # Set the line styles for the different lines
-    true_line_u = dict(color='cornflowerblue')
-    true_line_f = dict(color='orange')
+    true_line_u = dict(color='orange')
+    true_line_f = dict(color='cornflowerblue')
     pred_line = dict(linestyle='--', color='k', alpha=0.8)
     
     for j in range(3):
