@@ -140,7 +140,7 @@ def latent_space_plot(expt, index, dataset_name='train1', ax=None):
     plt.plot(x, f, **aec_line2, label=r'$\boldsymbol{\psi}_F \mathbf{F}(\mathbf{x})$')
 
     #Place the legend and label the axes
-    plt.legend(loc='lower left')
+    plt.legend(loc='lower right')
     plt.ylabel(r"$\mathbf{f}(\mathbf{x})$, $\mathbf{v}(\mathbf{x})$")
     plt.xlabel(r"$\mathbf{x}$")
 
@@ -167,7 +167,7 @@ def loss_boxplot(expt, dataset_name='test1', ax=None):
     ax = plt.gca()
     ax.set_yticks([1e-6, 1e-5, 1e-4, 1e-3])
     ax.set_yticklabels([r"$10^{-6}$", r"$10^{-5}$", r"$10^{-4}$", r"$10^{-3}$"])
-
+    plt.minorticks_off()
 
 def training_loss_epochs_plot(expt, roll_window=20, ax=None):
     # Load up the training history for a given experiment
@@ -205,7 +205,7 @@ def training_loss_epochs_plot(expt, roll_window=20, ax=None):
     plt.ylabel("Normalized MSE")
     plt.legend(loc='upper right')
     plt.xlim([0,val_loss.shape[0]])
-
+    plt.minorticks_off()
 
 
 def waterfall_plot(fig, ax, X, Y, Z, **kwargs):
@@ -296,8 +296,9 @@ def generate_GL_plot(expt, G_off=0.7, L_off=0.7, fig=None, axs=None):
     # Place the z-axis label using text command
     ax1.text(x=-0.5, y=2*np.pi, z=1.2*np.max(G), s=r'$\mathbf{G}$')#rotation_mode=None, rotation=180)
 
-    # Set up the view position angle
+    # Set up the view position angle, and turn off the grid:
     ax1.view_init(15,215)
+    ax1.grid(False)
 
     # Now plot of L
     waterfall_plot(fig, ax2, X, XI, L, **waterfall_opts) 
@@ -328,9 +329,9 @@ def generate_GL_plot(expt, G_off=0.7, L_off=0.7, fig=None, axs=None):
     # Place the z-axis label using text command
     ax2.text(x=-0.5, y=2*np.pi, z=1.2*np.max(L), s=r'$\mathbf{L}$')#rotation_mode=None, rotation=180)
 
-    # Set up the view position angle
+    # Set up the view position angle, and turn off the grid:
     ax2.view_init(15,215)
-
+    ax2.grid(False)
 
 def generate_G_plot(expt, G_off=0.7):
     # Grab the relevant L and G matrices
@@ -385,6 +386,7 @@ def generate_G_plot(expt, G_off=0.7):
 
     # Set up the view position angle
     ax.view_init(15,215)
+    ax.grid(False)
     
     # Return the figure reference
     return fig
