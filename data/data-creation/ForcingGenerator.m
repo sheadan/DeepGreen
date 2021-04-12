@@ -89,16 +89,6 @@ for i = 1:length(A)
     idx = idx + 1;
 end
 
-% Now ax^3 + bx^2 functions
-for i = 1:length(A)
-    a_i = A(i);
-    for j = 1:length(B)
-        b_i = B(j);
-        forcings(idx,:) = a_i*(x-x0).^3+b_i*(x-x0).^2;
-        idx = idx + 1;
-    end
-end
-
 % Finally ax^3 + bx^2 + cx
 for i = 1:length(A)
     a_i = A(i);

@@ -24,8 +24,6 @@ C_array = np.linspace(-5, 5, 11)
 total_examples = (Ax_array.shape[0] * Ay_array.shape[0]
                   + Ax_array.shape[0] * Ay_array.shape[0]
                   * Bx_array.shape[0] * By_array.shape[0]
-                  + Ax_array.shape[0] * Ay_array.shape[0]
-                  * Bx_array.shape[0] * By_array.shape[0]
                   * C_array.shape[0])
 u_array = np.zeros((total_examples, nx + 1, ny + 1))
 f_array = np.zeros((total_examples, nx + 1, ny + 1))
@@ -72,54 +70,7 @@ for ix in range(Ax_array.shape[0]):
         forcing_array = vertex_values_f.reshape((nx + 1, ny + 1))
         f_array[ex_num, :, :] = forcing_array
 
-        ex_num = ex_num + 1
-
-for ix in range(Ax_array.shape[0]):
-    print("i =", ix)
-    Ax = Ax_array[ix]
-    for iy in range(Ay_array.shape[0]):
-        Ay = Ay_array[iy]
-        for jx in range(Bx_array.shape[0]):
-            Bx = Bx_array[jx]
-            for jy in range(By_array.shape[0]):
-                By = By_array[jy]
-
-                # Create mesh and define function space
-                mesh = RectangleMesh(Point(xmin, ymin),
-                                     Point(xmax, ymax),
-                                     nx,
-                                     ny)
-
-                V = FunctionSpace(mesh, "CG", 1)
-
-                # Define boundary condition
-                def boundary(x, on_boundary):
-                    return on_boundary
-
-                g = Constant(0.0)
-                bc = DirichletBC(V, g, boundary)
-
-                # Define variational problem
-                u = Function(V)
-                v = TestFunction(V)
-                f = Expression("Ax*pow(x[0]-c,3)+Ay*pow(x[1]-c,3)+Bx*pow(x[0]-c,2)+By*pow(x[1]-c,2)",
-                               degree=2, Ax=Ax, Ay=Ay, Bx=Bx, By=By, c=np.pi)
-                F = dot((1 + u**2) * grad(u), grad(v)) * dx - f * v * dx
-
-                # Compute solution
-                solve(F == 0, u, bc,
-                      solver_parameters={"newton_solver":
-                                         {"relative_tolerance": 1e-6}})
-
-                vertex_values_u = u.compute_vertex_values(mesh)
-                solution_array = vertex_values_u.reshape((nx + 1, ny + 1))
-                u_array[ex_num, :, :] = solution_array
-
-                vertex_values_f = f.compute_vertex_values(mesh)
-                forcing_array = vertex_values_f.reshape((nx + 1, ny + 1))
-                f_array[ex_num, :, :] = forcing_array
-
-                ex_num = ex_num + 1
+        ex_num = ex_num + 1      
 
 for ix in range(Ax_array.shape[0]):
     print("i =", ix)
