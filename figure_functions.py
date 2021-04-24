@@ -433,3 +433,52 @@ def summary_boxplot(s0, s1, s2):
                ["System 1", "System 2", "System 3"],
                ncol=3, loc='center', bbox_to_anchor=(0.5, -0.28))
 
+def get_plot_options():
+    # Set plotting parameters
+    global_params = {'figure.dpi': 600,  # DPI to render figure
+                     'text.usetex': True,  # Tells matplotlib to use LaTeX to render labels, titles, etc. so you can use ${math}$
+                     'text.latex.preamble': r"\usepackage{amsfonts,amsmath,amssymb}", # Any packages you want LaTeX to load
+                     'font.family': 'sans-serif',  # Use sans serif texts
+                     'savefig.dpi': 600,  # DPI for saved figure
+                     'savefig.pad_inches': 0.025,  # Padding (white space) around saved figures
+                     'savefig.transparent': True,  # Makes the background transparent -- this is useful if you save .svg files and want to overlay them
+                     # Box plot settings
+                     'boxplot.boxprops.linewidth': 0.5,  # Width of the perimeter box at 
+                     'boxplot.whiskerprops.linewidth': 0.5,  # Linewidth of the whisker vertical lines
+                     'boxplot.capprops.linewidth': 0.5,  # width of the whisker cap (the horizontal line at top/bottom of the box whisker)
+                     'boxplot.medianprops.linewidth' : 0.5,  # Linewidth of the median line in the quartile box
+                    }
+    
+    full_params = {'figure.figsize': (7.3, 3.65),  # In inches
+                   'figure.titlesize': 12,  # Title font size, point size ('suptitle')
+                   'axes.labelsize': 10,  # Axes tick labels font size, point size
+                   'axes.titlesize': 12,  # Axes figure label font size, point size ('Axes' object level)
+                   'legend.fontsize': 10,  # Legend text font size, point size
+                   'xtick.labelsize': 12,  # X axis tick labels font size, point size
+                   'ytick.labelsize': 12,  # Y axis tick labels font size, point size
+                   'lines.linewidth': 1.75, # Width of lines on plots
+                  }
+    
+    half_params = {'figure.figsize': (3.5, 2.5),
+                   'figure.titlesize': 10,
+                   'lines.linewidth' : 1, 
+                   'axes.labelsize': 9,
+                   'axes.titlesize': 9,
+                   'legend.fontsize': 9,
+                   'xtick.labelsize': 9,
+                   'ytick.labelsize': 9,
+                   'axes.linewidth': 0.5,  # Thickness of the axes frame
+                   'lines.markersize' : 6,  # Size of markers on plot lines
+                   'lines.markeredgewidth': 0.5,  # Thickness of marker outlines
+                   'xtick.major.width': 0.5,  # Length of the major tickmarks on the x axis
+                   'ytick.major.width': 0.5,  # Length of the major tickmarks on the y axis
+                   'ytick.minor.width': 0.3,  # Length of the minor tickmarks on the y axis
+                   'ytick.major.pad': 0.0,  # Distance between end of tickmark and the tick labels
+                  }
+    
+    # Add global parameters to the full_params and half_params dictionaries
+    full_params.update(global_params)
+    half_params.update(global_params)
+
+    # Return the full params and half params dictionaries:
+    return full_params, half_params
