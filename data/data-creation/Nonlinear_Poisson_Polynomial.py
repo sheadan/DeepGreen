@@ -70,7 +70,7 @@ for ix in range(Ax_array.shape[0]):
         forcing_array = vertex_values_f.reshape((nx + 1, ny + 1))
         f_array[ex_num, :, :] = forcing_array
 
-        ex_num = ex_num + 1      
+        ex_num = ex_num + 1
 
 for ix in range(Ax_array.shape[0]):
     print("i =", ix)
@@ -122,6 +122,6 @@ for ix in range(Ax_array.shape[0]):
 
                     ex_num = ex_num + 1
 
-prefix = 'Nonlinear_Poisson_expt1_'
+prefix = 'S3-NLP_'
 np.save(prefix + 'Polynomial_us', u_array)
 np.save(prefix + 'Polynomial_fs', f_array)

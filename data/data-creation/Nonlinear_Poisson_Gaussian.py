@@ -72,6 +72,6 @@ for i in range(A_array.shape[0]):
 
                 ex_num = ex_num + 1
 
-prefix = 'Nonlinear_Poisson_expt1_'
+prefix = 'S3-NLP_'
 np.save(prefix + 'Gaussian_us', u_array)
 np.save(prefix + 'Gaussian_fs', f_array)

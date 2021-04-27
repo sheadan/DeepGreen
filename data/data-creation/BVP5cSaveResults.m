@@ -1,7 +1,8 @@
 close all; clc; clear all;
 
 %% load results
-forcings_file = 'Computed_Solutions-NLSL-2020-06-04-14.37.mat';
+forcings_file = 'Computed_Solutions-S0-2021-04-26-19.21.mat';
+output_file = 'S0data.mat';
 load(forcings_file)
 
 %% Find acceptable solutions
@@ -14,7 +15,7 @@ max_error = 1e-8;
 [gaussian_us,gaussian_fs,gaussian_ind] = stack_acceptable_solutions(gaussian_sols, gaussian_fs, max_error, x);
 
 %% Saving into .mat file
-save('NLSL_expt2.mat','cos_us','cos_fs','cos_ind','poly_us',...
+save(output_file, 'cos_us','cos_fs','cos_ind','poly_us',...
     'poly_fs','poly_ind','gaussian_us','gaussian_fs','gaussian_ind')
 
 %% Functions

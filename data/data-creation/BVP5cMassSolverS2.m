@@ -1,7 +1,7 @@
 close all; clc; clear all;
 
 %% Load the BVP forcings, along with corresponding x-vector
-forcings_file = 'bvp_forcings_1.1.mat';
+forcings_file = 'bvp_forcings_1.0.mat';
 load(forcings_file)
 
 %% This section sets up model parameters and solver options
@@ -21,7 +21,7 @@ gaussian_sols = compute_solutions(gaussian_fs, x, alpha, solinit, options);
 
 %% save the *entire* workspace (in case anything is of interest later)
 current_datetime=datestr(now,'yyyy-mm-dd-HH.MM');
-filename = ['Computed_Solutions-NLSL-',current_datetime,'.mat']
+filename = ['Computed_Solutions-S2-',current_datetime,'.mat']
 save(filename)
 
 %% This section contains all functions used in this script.

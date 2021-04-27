@@ -55,7 +55,7 @@ for idx=1:num_fs
 end
 
 %% Save the forcings
-filename = 'bvp_forcings_1.1.mat';
+filename = 'bvp_forcings_1.0.mat';
 save(filename, 'cos_fs', 'gaussian_fs', 'poly_fs', 'x');
 
 

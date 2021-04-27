@@ -8,7 +8,7 @@ import numpy as np
 
 # Define limits of rectangular domain
 xmin = 0
-xmax = 2*np.pi
+xmax = 2 * np.pi
 ymin = xmin
 ymax = xmax
 
@@ -16,17 +16,17 @@ ymax = xmax
 nx = 127
 ny = 127
 
-A_array = np.linspace(1,10,91)
-kx_array = np.linspace(1,5,9)
-ky_array = np.linspace(1,5,9)
+A_array = np.linspace(1, 10, 91)
+kx_array = np.linspace(1, 5, 9)
+ky_array = np.linspace(1, 5, 9)
 
-total_examples = A_array.shape[0]*kx_array.shape[0]*ky_array.shape[0]
-u_array = np.zeros((total_examples,nx+1,ny+1))
-f_array = np.zeros((total_examples,nx+1,ny+1))
+total_examples = A_array.shape[0] * kx_array.shape[0] * ky_array.shape[0]
+u_array = np.zeros((total_examples, nx + 1, ny + 1))
+f_array = np.zeros((total_examples, nx + 1, ny + 1))
 
 ex_num = 0
 for i in range(A_array.shape[0]):
-    print("i =",i)
+    print("i =", i)
     A = A_array[i]
     for j in range(kx_array.shape[0]):
         kx = kx_array[j]
@@ -49,22 +49,23 @@ for i in range(A_array.shape[0]):
             u = Function(V)
             v = TestFunction(V)
             f = Expression("A*cos(kx*x[0])*cos(ky*x[1])", degree=2, A=A, kx=kx, ky=ky)
-            F = dot((1 + u**2)*grad(u), grad(v))*dx - f*v*dx
+            F = dot((1 + u**2) * grad(u), grad(v)) * dx - f * v * dx
 
             # Compute solution
-            solve(F == 0, u, bc, solver_parameters={"newton_solver":
-                                        {"relative_tolerance": 1e-6}})
+            solve(F == 0, u, bc,
+                  solver_parameters={"newton_solver":
+                                     {"relative_tolerance": 1e-6}})
 
             vertex_values_u = u.compute_vertex_values(mesh)
-            solution_array = vertex_values_u.reshape((nx+1,ny+1))
-            u_array[ex_num,:,:] = solution_array
+            solution_array = vertex_values_u.reshape((nx + 1, ny + 1))
+            u_array[ex_num, :, :] = solution_array
 
             vertex_values_f = f.compute_vertex_values(mesh)
-            forcing_array = vertex_values_f.reshape((nx+1,ny+1))
-            f_array[ex_num,:,:] = forcing_array
+            forcing_array = vertex_values_f.reshape((nx + 1, ny + 1))
+            f_array[ex_num, :, :] = forcing_array
 
-            ex_num = ex_num+1
+            ex_num = ex_num + 1
 
-prefix = 'Nonlinear_Poisson_expt1_'
+prefix = 'S3-NLP_'
 np.save(prefix + 'Cosine_us', u_array)
 np.save(prefix + 'Cosine_fs', f_array)

@@ -3,7 +3,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 # Load data
-mat = scipy.io.loadmat('Duffing_Equation_expt9.mat')
+mat = scipy.io.loadmat('S0data.mat')
+
 Cosine_us = mat['cos_us']
 Cosine_fs = mat['cos_fs']
 
@@ -25,7 +26,7 @@ data_train_us, data_test1_us, data_train_fs, data_test1_fs = train_test_split(da
 data_train_us, data_val_us, data_train_fs, data_val_fs = train_test_split(data_train_us, data_train_fs, test_size=0.2)
 
 # Save files
-prefix = 'Duffing_Equation_expt9_'
+prefix = 'S0-Oscillator_'
 
 np.save(prefix + 'train1_u', data_train_us)
 np.save(prefix + 'train1_f', data_train_fs)
