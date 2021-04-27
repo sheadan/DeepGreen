@@ -12,7 +12,7 @@ Run `ForcingGenerator.m`. This creates a file called `bvp_forcings_1.0.mat` that
 
 ### 2. Solve the boundary value problems
 
-There are three scripts, each of which solves one of the one-dimensional systems in the paper using MATLAB's built in bvp5c. `BVP5cMassSolverS0.m`  solves the cubic Helmholtz equation using the forcing functions in `bvp_forcings_1.0.mat` and saves the solutions in a file named `Computed_Solutions-S0-datetime.mat`. Similarly, the nonlinear Sturm--Liouville equation is solved using `BVP5cMassSolverS1.m` and the nonlinear biharmonic equation is solved using `BVP5cMassSolverS2.m`.
+There are three scripts, each of which solves one of the one-dimensional systems in the paper using MATLAB's built in bvp5c. `BVP5cMassSolverS0.m`  solves the cubic Helmholtz equation using the forcing functions in `bvp_forcings_1.0.mat` and saves the solutions in a file named `Computed_Solutions-S0-datetime.mat`. Similarly, the nonlinear Sturm-Liouville equation is solved using `BVP5cMassSolverS1.m` and the nonlinear biharmonic equation is solved using `BVP5cMassSolverS2.m`.
 
 ### 3. Find acceptable solutions
 
