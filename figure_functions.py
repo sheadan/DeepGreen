@@ -10,6 +10,7 @@ import matplotlib.ticker as mtick
 import matplotlib as mpl
 from matplotlib.patches import FancyArrowPatch
 from matplotlib.collections import LineCollection
+from matplotlib.cm import ScalarMappable
 
 from architecture.NormalizedMeanSquaredError import NormalizedMeanSquaredError as NMSE
 
@@ -482,3 +483,224 @@ def get_plot_options():
 
     # Return the full params and half params dictionaries:
     return full_params, half_params
+
+# Functions for 2D figures
+def plot_predict_vs_true(i, pred_u, pred_f, u, f, fig, ax1, ax2, cbticksu, cbticksF, cbticksDu, cbticksDF, label):
+    
+    # Grab the 'true' value
+    true_u = u[i,:,:]
+    true_F = f[i,:,:]
+
+    # And predicted value
+    predict_u = pred_u[i,:,:]
+    predict_F = pred_f[i,:,:]
+
+    # create a space vector
+    x = np.linspace(0,2*np.pi, predict_u.shape[0])
+    X, Y = np.meshgrid(x,x)
+    
+    # Set colorbar limits
+    uMax = np.max(np.vstack((true_u, predict_u)))
+    uMin = np.min(np.vstack((true_u, predict_u)))
+    FMax = np.max(np.vstack((true_F, predict_F)))
+    FMin = np.min(np.vstack((true_F, predict_F)))
+    uInf = np.max((abs(uMax), abs(uMin)))
+    FInf = np.max((abs(FMax), abs(FMin)))
+    
+    Diff_u = (true_u-predict_u)/uInf
+    DuMax = np.max(Diff_u)
+    DuMin = np.min(Diff_u)
+    
+    Diff_F = (true_F-predict_F)/FInf
+    DFMax = np.max(Diff_F)
+    DFMin = np.min(Diff_F)
+    
+    # Create the figures
+    ax = ax1[0]
+    cont = ax.contourf(X, Y, true_u, levels=100, vmin=uMin, vmax=uMax)
+    if not cbticksu:
+        cbar = fig.colorbar(cont, ax=ax, format='%.0e')
+        cbar.ax.locator_params(nbins=3)
+        print("Min u: {:.2e}".format(uMin))
+        print("Max u: {:.2e}".format(uMax))
+    else:
+        cbar = fig.colorbar(ScalarMappable(norm=cont.norm, cmap=cont.cmap), ax=ax, ticks=[float(i) for i in cbticksu])
+        cbar.formatter.set_powerlimits((0, 0))
+        cbar.update_ticks()
+    if label:
+        ax.set_title(r'True')
+    ax.set_ylabel(r"$\mathbf{u}(x)$")
+    ax.set_xlim([0,2*np.pi])
+    ax.set_yticks([0, np.pi, 2*np.pi])
+    ax.set_yticklabels(["0", r"$\pi$", r"$2\pi$"])
+    ax.set_ylim([0,2*np.pi])
+
+    ax = ax2[0]
+    cont = ax.contourf(X, Y, true_F, levels=100, vmin=FMin, vmax=FMax)
+    if not cbticksF:
+        cbar = fig.colorbar(cont, ax=ax, format='%.0e')
+        cbar.ax.locator_params(nbins=3)
+        print("Min F: {:.2e}".format(FMin))
+        print("Max F: {:.2e}".format(FMax))
+    else:
+        cbar = fig.colorbar(ScalarMappable(norm=cont.norm, cmap=cont.cmap), ax=ax, ticks=[float(i) for i in cbticksF])
+        cbar.formatter.set_powerlimits((0, 0))
+        cbar.update_ticks()
+    ax.set_ylabel(r"$\mathbf{F}(x)$")
+    ax.set_xticks([0, np.pi, 2*np.pi])
+    ax.set_xticklabels(["0", r"$\pi$", r"$2\pi$"])
+    ax.set_xlim([0,2*np.pi])
+    ax.set_yticks([0, np.pi, 2*np.pi])
+    ax.set_yticklabels(["0", r"$\pi$", r"$2\pi$"])
+    ax.set_ylim([0,2*np.pi])
+    
+    ax = ax1[1]
+    cont = ax.contourf(X, Y, predict_u, levels=100, vmin=uMin, vmax=uMax)
+    if not cbticksu:
+        cbar = fig.colorbar(cont, ax=ax, format='%.0e')
+        cbar.ax.locator_params(nbins=3)
+    else:
+        cbar = fig.colorbar(ScalarMappable(norm=cont.norm, cmap=cont.cmap), ax=ax, ticks=[float(i) for i in cbticksu])
+        cbar.formatter.set_powerlimits((0, 0))
+        cbar.update_ticks()
+    if label:
+        ax.set_title(r'Predicted')
+    ax.set_yticks([0, np.pi, 2*np.pi])
+    ax.set_yticklabels(["", "", ""])
+    ax.set_xlim([0,2*np.pi])
+    ax.set_ylim([0,2*np.pi])
+    
+    ax = ax2[1]
+    cont = ax.contourf(X, Y, predict_F, levels=100, vmin=FMin, vmax=FMax)
+    if not cbticksF:
+        cbar = fig.colorbar(cont, ax=ax, format='%.0e')
+        cbar.ax.locator_params(nbins=3)
+    else:
+        cbar = fig.colorbar(ScalarMappable(norm=cont.norm, cmap=cont.cmap), ax=ax, ticks=[float(i) for i in cbticksF])
+        cbar.formatter.set_powerlimits((0, 0))
+        cbar.update_ticks()
+    ax.set_xticks([0, np.pi, 2*np.pi])
+    ax.set_xticklabels(["0", r"$\pi$", r"$2\pi$"])
+    ax.set_yticks([0, np.pi, 2*np.pi])
+    ax.set_yticklabels(["", "", ""])
+    ax.set_xlim([0,2*np.pi])
+    ax.set_ylim([0,2*np.pi])
+    
+    ax = ax1[2]
+    cont = ax.contourf(X, Y, Diff_u, 100, vmin=DuMin, vmax=DuMax)
+    if not cbticksDu:
+        cbar = fig.colorbar(cont, ax=ax, format='%.0e')
+        cbar.ax.locator_params(nbins=3)
+        print("Min u difference: {:.2e}".format(DuMin))
+        print("Max u difference: {:.2e}".format(DuMax))
+    else:
+        cbar = fig.colorbar(ScalarMappable(norm=cont.norm, cmap=cont.cmap), ax=ax, ticks=[float(i) for i in cbticksDu])
+        cbar.formatter.set_powerlimits((0, 0))
+        cbar.update_ticks()
+    if label:
+        ax.set_title('Difference')
+    ax.set_yticks([0, np.pi, 2*np.pi])
+    ax.set_yticklabels(["", "", ""])
+    ax.set_xlim([0,2*np.pi])
+    ax.set_ylim([0,2*np.pi])
+
+    ax = ax2[2]
+    cont = ax.contourf(X, Y, Diff_F, 100, vmin=DFMin, vmax=DFMax)
+    if not cbticksDF:
+        cbar = fig.colorbar(cont, ax=ax, format='%.0e')
+        cbar.ax.locator_params(nbins=3)
+        print("Min F difference: {:.2e}".format(DFMin))
+        print("Max F difference: {:.2e}".format(DFMax))
+    else:
+        cbar = fig.colorbar(ScalarMappable(norm=cont.norm, cmap=cont.cmap), ax=ax, ticks=[float(i) for i in cbticksDF])
+        cbar.formatter.set_powerlimits((0, 0))
+        cbar.update_ticks()
+    ax.set_xticks([0, np.pi, 2*np.pi])
+    ax.set_xticklabels(["0", r"$\pi$", r"$2\pi$"])
+    ax.set_yticks([0, np.pi, 2*np.pi])
+    ax.set_yticklabels(["", "", ""])
+    ax.set_xlim([0,2*np.pi])
+    ax.set_ylim([0,2*np.pi])
+    
+    # Change spacing
+    fig.subplots_adjust(wspace=0.3, hspace=0.2)
+
+def generate_compare_plot(expt, data_name, mode,
+                          fig=None, axs=None,
+                          cbticksu=[], cbticksF=[],
+                          cbticksDu=[], cbticksDF=[],
+                          label=True):
+    
+    u = expt.data['{}_u'.format(data_name)]
+    F = expt.data['{}_f'.format(data_name)]
+  
+        
+    [ax1, ax2] = axs
+    i = expt.find_sample(dataset_name=data_name, mode=mode)
+    u_pred, F_pred = expt.predict_uF(u, F)
+
+    plot_predict_vs_true(i, u_pred, F_pred, u, F, fig, ax1, ax2, 
+                         cbticksu, cbticksF, cbticksDu, cbticksDF, label)
+
+def prediction_compare_plot2D(expt, dataset_name,
+                              cbticksu_best=[], cbticksF_best=[],
+                              cbticksDu_best=[], cbticksDF_best=[],
+                              cbticksu_worst=[], cbticksF_worst=[],
+                              cbticksDu_worst=[], cbticksDF_worst=[],):
+    
+    letter_opts=dict(weight='bold', fontsize=9)
+
+    fig = plt.figure()
+    gs = fig.add_gridspec(4, 4, width_ratios=[0.2,1,1,1])
+    ax1 = [fig.add_subplot(gs[0,1]), 
+           fig.add_subplot(gs[0,2]), 
+           fig.add_subplot(gs[0,3])]
+
+    ax2 = [fig.add_subplot(gs[1,1], sharex=ax1[0]), 
+           fig.add_subplot(gs[1,2], sharex=ax1[1]), 
+           fig.add_subplot(gs[1,3], sharex=ax1[2])]
+
+    ax3 = [fig.add_subplot(gs[2,1], sharex=ax1[0]), 
+           fig.add_subplot(gs[2,2], sharex=ax1[1]), 
+           fig.add_subplot(gs[2,3], sharex=ax1[2])]
+
+    ax4 = [fig.add_subplot(gs[3,1], sharex=ax1[0]), 
+           fig.add_subplot(gs[3,2], sharex=ax1[1]), 
+           fig.add_subplot(gs[3,3], sharex=ax1[2])]
+
+    # Plot the prediction curves:
+    generate_compare_plot(expt, dataset_name, "Best", 
+                          fig=fig, axs=[ax1,ax2],
+                          cbticksu=cbticksu_best, cbticksF=cbticksF_best, 
+                          cbticksDu=cbticksDu_best, cbticksDF=cbticksDF_best)
+    generate_compare_plot(expt, dataset_name, "Worst", 
+                          fig=fig, axs=[ax3,ax4],
+                          cbticksu=cbticksu_worst, cbticksF=cbticksF_worst, 
+                          cbticksDu=cbticksDu_worst, cbticksDF=cbticksDF_worst,
+                          label=False)
+
+    # Add labels to left label axes
+    ax5 = fig.add_subplot(gs[0:1,0], frameon=False)
+    ax6 = fig.add_subplot(gs[2:3,0], frameon=False)
+
+    props = dict(rotation=90)
+    text_opts = dict(weight='bold', fontsize=9, ha='center', va='center')
+
+    ax5.text(x=0.5, y=0, s="Best Example", transform=ax5.transAxes, **props, **text_opts)
+    ax5.text(x=-0.5, y=1, s="(a)", transform=ax5.transAxes, **letter_opts)
+
+    ax6.text(x=0.5, y=0, s="Worst Example", transform=ax6.transAxes, **props, **text_opts)
+    ax6.text(x=-0.5, y=1, s="(b)", transform=ax6.transAxes, **letter_opts)
+
+    plt.subplots_adjust(wspace=0.3, hspace=0.2)
+
+    # Turn off the shared axes' axis xlabels
+    for ax_list in [ax1,ax2,ax3]:
+        for ax in ax_list:
+            plt.setp(ax.get_xticklabels(), visible=False)
+
+    for ax in [ax5,ax6]:
+        plt.setp(ax.get_xticklabels(), visible=False)
+        plt.setp(ax.get_yticklabels(), visible=False)
+        ax.set_xticks([])
+        ax.set_yticks([])
