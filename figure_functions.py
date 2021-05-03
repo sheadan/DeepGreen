@@ -521,8 +521,6 @@ def plot_predict_vs_true(i, pred_u, pred_f, u, f, fig, ax1, ax2, cbticksu, cbtic
     if not cbticksu:
         cbar = fig.colorbar(cont, ax=ax, format='%.0e')
         cbar.ax.locator_params(nbins=3)
-        print("Min u: {:.2e}".format(uMin))
-        print("Max u: {:.2e}".format(uMax))
     else:
         cbar = fig.colorbar(ScalarMappable(norm=cont.norm, cmap=cont.cmap), ax=ax, ticks=[float(i) for i in cbticksu])
         cbar.formatter.set_powerlimits((0, 0))
@@ -540,8 +538,6 @@ def plot_predict_vs_true(i, pred_u, pred_f, u, f, fig, ax1, ax2, cbticksu, cbtic
     if not cbticksF:
         cbar = fig.colorbar(cont, ax=ax, format='%.0e')
         cbar.ax.locator_params(nbins=3)
-        print("Min F: {:.2e}".format(FMin))
-        print("Max F: {:.2e}".format(FMax))
     else:
         cbar = fig.colorbar(ScalarMappable(norm=cont.norm, cmap=cont.cmap), ax=ax, ticks=[float(i) for i in cbticksF])
         cbar.formatter.set_powerlimits((0, 0))
@@ -591,8 +587,6 @@ def plot_predict_vs_true(i, pred_u, pred_f, u, f, fig, ax1, ax2, cbticksu, cbtic
     if not cbticksDu:
         cbar = fig.colorbar(cont, ax=ax, format='%.0e')
         cbar.ax.locator_params(nbins=3)
-        print("Min u difference: {:.2e}".format(DuMin))
-        print("Max u difference: {:.2e}".format(DuMax))
     else:
         cbar = fig.colorbar(ScalarMappable(norm=cont.norm, cmap=cont.cmap), ax=ax, ticks=[float(i) for i in cbticksDu])
         cbar.formatter.set_powerlimits((0, 0))
@@ -609,8 +603,6 @@ def plot_predict_vs_true(i, pred_u, pred_f, u, f, fig, ax1, ax2, cbticksu, cbtic
     if not cbticksDF:
         cbar = fig.colorbar(cont, ax=ax, format='%.0e')
         cbar.ax.locator_params(nbins=3)
-        print("Min F difference: {:.2e}".format(DFMin))
-        print("Max F difference: {:.2e}".format(DFMax))
     else:
         cbar = fig.colorbar(ScalarMappable(norm=cont.norm, cmap=cont.cmap), ax=ax, ticks=[float(i) for i in cbticksDF])
         cbar.formatter.set_powerlimits((0, 0))
