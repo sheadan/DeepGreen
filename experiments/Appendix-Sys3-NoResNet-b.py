@@ -2,10 +2,6 @@
 import random as r
 import sys
 
-import tensorflow as tf
-for gpu in tf.config.experimental.list_physical_devices("GPU"):
-  tf.config.experimental.set_memory_growth(gpu, True)
-
 from tensorflow import keras
 from tensorflow.keras.regularizers import l1_l2
 from tensorflow.keras.activations import relu
@@ -18,7 +14,7 @@ from Conv2DEncoderDecoder import Conv2DEncoder, Conv2DDecoder
 from NormalizedMeanSquaredError import NormalizedMeanSquaredError2D as NMSE
 
 # Example Experiment Script:
-expt_name = 'S3-NoResNet-c'
+expt_name = 'S3-NoResNet-b'
 data_file_prefix = '../data/S3-NLP'
 
 # Set size of latent space, and retrieve the 'full' size of the data

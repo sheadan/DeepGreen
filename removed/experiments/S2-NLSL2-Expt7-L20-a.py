@@ -14,62 +14,45 @@ from utils import run_experiment, get1Ddatasize
 
 # Add the architecture path for the DenseEncoderDecoder and NMSE
 sys.path.append("../architecture/")
-from Conv2DEncoderDecoder import Conv2DEncoder, Conv2DDecoder
-from NormalizedMeanSquaredError import NormalizedMeanSquaredError2D as NMSE
+from DenseEncoderDecoder import DenseEncoderDecoder
+from NormalizedMeanSquaredError import NormalizedMeanSquaredError as NMSE
+
 
 # Example Experiment Script:
-expt_name = 'S3-NoResNet-a'
-data_file_prefix = '../data/S3-NLP'
+expt_name = 'S2-NLSL2-Expt7-L20-a'
+data_file_prefix = '../data/S2-NLSL2'
 
 # Set size of latent space, and retrieve the 'full' size of the data
-units_latent = 200
-input_shape = get1Ddatasize(data_file_prefix)[-2:]  # the inputs have shape given by the last two dimensions
-units_full = input_shape[0]*input_shape[1]
+units_latent = 20
+units_full = get1Ddatasize(data_file_prefix)[-1] # the last dimension is the 'length' of the data, for 1D data
 
 # Set up encoder and decoder configuration dict(s)
 activation = relu
 initializer = keras.initializers.VarianceScaling()
 regularizer = l1_l2(0, 1e-6)
 
-convlay_config = {'kernel_size': 4,
-                  'strides': 1,
-                  'padding': 'SAME',
-                  'activation': activation,
-                  'kernel_initializer': initializer,
-                  'kernel_regularizer': regularizer}
+actlay_config = {'activation': activation,
+                 'kernel_initializer': initializer,
+                 'kernel_regularizer': regularizer}
 
-poollay_config = {'pool_size': 2,
-                  'strides': 2,
-                  'padding': 'VALID'}
+linlay_config = {'activation': None,
+                 'kernel_initializer': initializer,
+                 'kernel_regularizer': regularizer}
 
-deconvlay_config = {'kernel_size': 4,
-                    'strides': 2,
-                    'padding': 'SAME',
-                    'activation': activation,
-                    'kernel_initializer': initializer,
-                    'kernel_regularizer': regularizer}
-
-enc_config = {'num_filters': [8, 16, 32, 64],
-              'convlay_config': convlay_config,
-              'poollay_config': poollay_config,
-              'add_init_fin': False}
-
-init_size = [16, 16, 64]
-
-dec_config = {'init_size': init_size,
-              'output_size': [-1, input_shape[0], input_shape[1]],
-              'num_filters': [32, 16, 8],
-              'deconvlay_config': deconvlay_config,
-              'add_init_fin': False}
+enc_dec_config = {'units_full': units_full,
+                  'num_layers': 5,
+                  'actlay_config': actlay_config,
+                  'linlay_config': linlay_config,
+                  'add_init_fin': False}
 
 # Network configuration (this is how the AbstractArchitecture will be created)
 network_config = {'units_full': units_full,
                   'units_latent': units_latent,
-                  'u_encoder_block': Conv2DEncoder(**enc_config),
-                  'u_decoder_block': Conv2DDecoder(**dec_config), 
-                  'F_encoder_block': Conv2DEncoder(**enc_config),
-                  'F_decoder_block': Conv2DDecoder(**dec_config),
-                  'operator_initializer': keras.initializers.Identity()}  
+                  'u_encoder_block': DenseEncoderDecoder(**enc_dec_config),
+                  'u_decoder_block': DenseEncoderDecoder(**enc_dec_config),
+                  'F_encoder_block': DenseEncoderDecoder(**enc_dec_config),
+                  'F_decoder_block': DenseEncoderDecoder(**enc_dec_config),
+                  'operator_initializer': initializer}
 
 # Aggregate all the training options in one dictionary
 training_options = {'aec_only_epochs': 75, 
@@ -90,7 +73,7 @@ training_options = {'aec_only_epochs': 75,
 random_seed = r.randint(0, 10**(10))
 
 # Set the custom objects used in the model (for loading purposes)
-custom_objs = {"NormalizedMeanSquaredError2D": NMSE}
+custom_objs = {"NormalizedMeanSquaredError": NMSE}
 
 # And run the experiment!
 run_experiment(random_seed=random_seed,

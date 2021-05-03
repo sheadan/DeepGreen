@@ -2,10 +2,6 @@
 import random as r
 import sys
 
-import tensorflow as tf
-for gpu in tf.config.experimental.list_physical_devices("GPU"):
-  tf.config.experimental.set_memory_growth(gpu, True)
-
 from tensorflow import keras
 from tensorflow.keras.regularizers import l1_l2
 from tensorflow.keras.activations import relu
@@ -18,13 +14,13 @@ from Conv2DEncoderDecoder import Conv2DEncoder, Conv2DDecoder
 from NormalizedMeanSquaredError import NormalizedMeanSquaredError2D as NMSE
 
 # Example Experiment Script:
-expt_name = 'S3-ResNet-a'
+expt_name = 'Sys3-Experiment'
 data_file_prefix = '../data/S3-NLP'
 
 # Set size of latent space, and retrieve the 'full' size of the data
 units_latent = 200
 input_shape = get1Ddatasize(data_file_prefix)[-2:]  # the inputs have shape given by the last two dimensions
-units_full = input_shape[0]*input_shape[1]
+units_full = input_shape[0] * input_shape[1]
 
 # Set up encoder and decoder configuration dict(s)
 activation = relu
@@ -66,16 +62,16 @@ dec_config = {'init_size': init_size,
 network_config = {'units_full': units_full,
                   'units_latent': units_latent,
                   'u_encoder_block': Conv2DEncoder(**enc_config),
-                  'u_decoder_block': Conv2DDecoder(**dec_config), 
+                  'u_decoder_block': Conv2DDecoder(**dec_config),
                   'F_encoder_block': Conv2DEncoder(**enc_config),
                   'F_decoder_block': Conv2DDecoder(**dec_config),
-                  'operator_initializer': keras.initializers.Identity()}  
+                  'operator_initializer': keras.initializers.Identity()}
 
 # Aggregate all the training options in one dictionary
-training_options = {'aec_only_epochs': 75, 
+training_options = {'aec_only_epochs': 75,
                     'init_full_epochs': 250,
                     'best_model_epochs': 2500,
-                    'num_init_models': 20, 
+                    'num_init_models': 20,
                     'loss_fn': NMSE(),
                     'optimizer': keras.optimizers.Adam,
                     'optimizer_opts': {},

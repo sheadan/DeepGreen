@@ -2,10 +2,6 @@
 import random as r
 import sys
 
-import tensorflow as tf
-for gpu in tf.config.experimental.list_physical_devices("GPU"):
-  tf.config.experimental.set_memory_growth(gpu, True)
-
 from tensorflow import keras
 from tensorflow.keras.regularizers import l1_l2
 from tensorflow.keras.activations import relu
@@ -18,7 +14,7 @@ from Conv2DEncoderDecoder import Conv2DEncoder, Conv2DDecoder
 from NormalizedMeanSquaredError import NormalizedMeanSquaredError2D as NMSE
 
 # Example Experiment Script:
-expt_name = 'S3-NLP-Expt1-L200-a'
+expt_name = 'S3-ResNet-c'
 data_file_prefix = '../data/S3-NLP'
 
 # Set size of latent space, and retrieve the 'full' size of the data
@@ -65,10 +61,11 @@ dec_config = {'init_size': init_size,
 # Network configuration (this is how the AbstractArchitecture will be created)
 network_config = {'units_full': units_full,
                   'units_latent': units_latent,
-                  'encoder_block': Conv2DEncoder,
-                  'decoder_block': Conv2DDecoder,
-                  'encoder_config': enc_config,
-                  'decoder_config': dec_config}
+                  'u_encoder_block': Conv2DEncoder(**enc_config),
+                  'u_decoder_block': Conv2DDecoder(**dec_config), 
+                  'F_encoder_block': Conv2DEncoder(**enc_config),
+                  'F_decoder_block': Conv2DDecoder(**dec_config),
+                  'operator_initializer': keras.initializers.Identity()}  
 
 # Aggregate all the training options in one dictionary
 training_options = {'aec_only_epochs': 75, 
