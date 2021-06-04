@@ -137,10 +137,16 @@ class Experiment:
         # Compute L[v]
         Lv = tf.matmul(v, self.L)
         # Determine loss
-        lin_loss = np.asarray([NMSE()(f[i,:], Lv[i,:]) for i in range(f.shape[0])])
+        lin_loss = rel_mse(Lv, f)
         # Insert the linear loss into the list:
         losses.insert(2, lin_loss)
         #print('Linearity Loss:', lin_loss)
+        # Compute superposition loss L4
+        f_sums = tf.reshape(f[None]+f[:, None], [-1, f.shape[-1]])
+        Lv_sums = tf.reshape(Lv[None]+Lv[:, None], [-1, Lv.shape[-1]])
+        super_loss = rel_mse(Lv_sums, f_sums)
+        # Insert the superposition loss into the list:
+        losses.insert(3, super_loss)
         return losses
 
     def evaluate_model(self, dataset_name):
@@ -291,9 +297,13 @@ class Experiment2D:
         # Compute L[v]
         Lv = tf.matmul(v, self.L)
         # Determine loss
-        lin_loss = np.asarray([NMSE()(f[i,:], Lv[i,:]) for i in range(f.shape[0])])
+        lin_loss = self.rel_mse(Lv, f)
         # Insert the linear loss into the list:
         losses.insert(2, lin_loss)
+        # Compute superposition loss L4
+        f_sums = tf.reshape(f[None]+f[:, None], [-1, f.shape[-1]])
+        Lv_sums = tf.reshape(Lv[None]+Lv[:, None], [-1, Lv.shape[-1]])
+        super_loss = self.rel_mse(Lv_sums, f_sums)
         #print('Linearity Loss:', lin_loss)
         return losses
 
