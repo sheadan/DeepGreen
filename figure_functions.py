@@ -153,7 +153,7 @@ def latent_space_plot(expt, index, dataset_name='train1', ax=None):
 def loss_boxplot(expt, dataset_name='test1', ax=None):
     # Generate loss data, and set labels
     losses = expt.compute_losses(dataset_name)
-    labels = [r"$\mathcal{L}_1$", r"$\mathcal{L}_2$", r"$\mathcal{L}_3$",  r"$\mathcal{L}_5$", r"$\mathcal{L}_6$"]
+    labels = [r"$\mathcal{L}_1$", r"$\mathcal{L}_2$", r"$\mathcal{L}_3$", r"$\mathcal{L}_4$", r"$\mathcal{L}_5$", r"$\mathcal{L}_6$"]
 
     # Create a figure or instantiate new axes:
     set_axes(ax)
@@ -162,7 +162,7 @@ def loss_boxplot(expt, dataset_name='test1', ax=None):
     plt.boxplot(losses, labels=labels, showfliers=False, medianprops={'color': 'black'})
 
     # Format the Y-Axis
-    plt.ylabel("Normalized MSE")
+    plt.ylabel("Relative Error")
     plt.ylim([1e-6, 1e-3])
     plt.yscale('log')
     ax = plt.gca()
@@ -203,7 +203,7 @@ def training_loss_epochs_plot(expt, roll_window=20, ax=None):
 
     # Format the axes
     plt.xlabel("Epochs")
-    plt.ylabel("Normalized MSE")
+    plt.ylabel("Relative Error")
     plt.legend(loc='upper right')
     plt.xlim([0,val_loss.shape[0]])
     plt.minorticks_off()
@@ -397,32 +397,32 @@ def summary_boxplot(s0, s1, s2):
     s0_losses = s0.compute_losses('test1')
     s1_losses = s1.compute_losses('test1')
     s2_losses = s2.compute_losses('test1')
-    labels = [r"$\mathcal{L}_1$", r"$\mathcal{L}_2$", r"$\mathcal{L}_3$",  r"$\mathcal{L}_5$", r"$\mathcal{L}_6$"]
+    labels = [r"$\mathcal{L}_1$", r"$\mathcal{L}_2$", r"$\mathcal{L}_3$", r"$\mathcal{L}_4$", r"$\mathcal{L}_5$", r"$\mathcal{L}_6$"]
 
     # Set up figure, axes
     fig = plt.figure()
 
     # Plot each series
     b0=plt.boxplot(s0_losses,
-                   positions=[0.75, 1.75, 2.75, 3.75, 4.75],
+                   positions=[0.75, 1.75, 2.75, 3.75, 4.75, 5.75],
                    medianprops={'color': 'black'},
                    showfliers=False, widths=0.2)
 
     b1=plt.boxplot(s1_losses,
-                   positions=[1, 2, 3, 4, 5],
+                   positions=[1, 2, 3, 4, 5, 6],
                    medianprops={'color': 'green'},
                    showfliers=False, widths=0.2)
 
     b2=plt.boxplot(s2_losses,
-                   positions=[1.25, 2.25, 3.25, 4.25, 5.25],
+                   positions=[1.25, 2.25, 3.25, 4.25, 5.25, 6.25],
                    medianprops={'color': 'purple'},
                    showfliers=False, widths=0.2)
 
     # Format the X axis
-    plt.xticks([1,2,3,4, 5], labels)
+    plt.xticks([1,2,3,4,5,6], labels)
 
     # Format the Y-Axis
-    plt.ylabel("Normalized MSE")
+    plt.ylabel("Relative Error")
     plt.ylim([1e-6, 1e-1])
     plt.yscale('log')
     ax = plt.gca()
