@@ -392,7 +392,7 @@ def generate_G_plot(expt, G_off=0.7):
     # Return the figure reference
     return fig
 
-def summary_boxplot(s0, s1, s2):
+def summary_boxplot(s0, s1, s2, ax=None):
     # Generate loss data, and set labels
     s0_losses = s0.compute_losses('test1')
     s1_losses = s1.compute_losses('test1')
@@ -400,37 +400,39 @@ def summary_boxplot(s0, s1, s2):
     labels = [r"$\mathcal{L}_1$", r"$\mathcal{L}_2$", r"$\mathcal{L}_3$", r"$\mathcal{L}_4$", r"$\mathcal{L}_5$", r"$\mathcal{L}_6$"]
 
     # Set up figure, axes
-    fig = plt.figure()
+    if ax == None:
+        fig = plt.figure()
+        ax = plt.gca()
 
     # Plot each series
-    b0=plt.boxplot(s0_losses,
+    b0=ax.boxplot(s0_losses,
                    positions=[0.75, 1.75, 2.75, 3.75, 4.75, 5.75],
                    medianprops={'color': 'black'},
                    showfliers=False, widths=0.2)
 
-    b1=plt.boxplot(s1_losses,
+    b1=ax.boxplot(s1_losses,
                    positions=[1, 2, 3, 4, 5, 6],
                    medianprops={'color': 'green'},
                    showfliers=False, widths=0.2)
 
-    b2=plt.boxplot(s2_losses,
+    b2=ax.boxplot(s2_losses,
                    positions=[1.25, 2.25, 3.25, 4.25, 5.25, 6.25],
                    medianprops={'color': 'purple'},
                    showfliers=False, widths=0.2)
 
     # Format the X axis
-    plt.xticks([1,2,3,4,5,6], labels)
+    ax.set_xticks([1,2,3,4,5,6])
+    ax.set_xticklabels(labels)
 
     # Format the Y-Axis
-    plt.ylabel("Relative Error")
-    plt.ylim([1e-6, 1e-1])
-    plt.yscale('log')
-    ax = plt.gca()
+    ax.set_ylabel("Relative Error")
+    ax.set_ylim([1e-6, 1e-1])
+    ax.set_yscale('log')
     ax.set_yticks([1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
     ax.set_yticklabels([r"$10^{-6}$", r"$10^{-5}$", r"$10^{-4}$", r"$10^{-3}$", r"$10^{-2}$", r"$10^{-1}$"])
 
     # Format the legend
-    plt.legend([b0['medians'][0], b1['medians'][0], b2['medians'][0]],
+    ax.legend([b0['medians'][0], b1['medians'][0], b2['medians'][0]],
                ["System 1", "System 2", "System 3"],
                ncol=3, loc='center', bbox_to_anchor=(0.5, -0.28))
 
